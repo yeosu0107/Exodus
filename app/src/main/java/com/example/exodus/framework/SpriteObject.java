@@ -19,6 +19,7 @@ public class SpriteObject extends GraphicObject{
     private int  m_spriteWidth;
     private int  m_spriteHeight;
 
+    protected int     m_time;
     protected boolean m_bLoop = true;
     protected boolean m_bEnd = false;
 
@@ -30,13 +31,14 @@ public class SpriteObject extends GraphicObject{
         m_currFrame = 0;
     }
 
-    public void initSpriteData(int width, int height, int theFPS, int nFrame) {
-        m_spriteWidth = width;
-        m_spriteHeight = height;
-        m_rectangle.bottom = height;
-        m_rectangle.right= width;
+    public void initSpriteData(int theFPS, int nFrame, int time) { //fps, 프레임갯수, 확대배율
+        m_spriteWidth = m_bit.getWidth() / nFrame;
+        m_spriteHeight = m_bit.getHeight();
+        m_rectangle.bottom = m_spriteHeight;
+        m_rectangle.right= m_spriteWidth;
         m_fps = 1000 / theFPS;
         m_nFrame = nFrame;
+        m_time = time;
     }
 
     public void update(long time) {
@@ -52,10 +54,10 @@ public class SpriteObject extends GraphicObject{
     @Override
     public void draw(Canvas canvas) {
         Rect dest = new Rect(m_x, m_y,
-                m_x + m_spriteWidth, m_y + m_spriteHeight);
+                m_x + m_spriteWidth * m_time, m_y + m_spriteHeight * m_time);
 
         m_rectangle.left = m_currFrame * m_spriteWidth;
-        m_rectangle.right=m_rectangle.left + m_spriteWidth;
+        m_rectangle.right= m_rectangle.left + m_spriteWidth;
 
         canvas.drawBitmap(m_bit, m_rectangle, dest, null);
     }

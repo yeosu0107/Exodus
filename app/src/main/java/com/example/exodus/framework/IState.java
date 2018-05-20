@@ -15,5 +15,6 @@ public interface IState {
     public void Render(Canvas canvas);
 
     public boolean onKeyDown(int keyCode, KeyEvent event);
+    public boolean onKeyUp(int keyCode, KeyEvent event);
     public boolean onTouchEvent(MotionEvent event);
 }

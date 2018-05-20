@@ -9,9 +9,10 @@ import android.graphics.Rect;
  */
 
 public class GraphicObject {
-    protected Bitmap m_bit;
+    protected Bitmap  m_bit;
     protected int     m_x;
     protected int     m_y;
+
 
     public Rect m_boundBox;
 

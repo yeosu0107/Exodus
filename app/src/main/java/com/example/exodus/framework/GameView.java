@@ -8,6 +8,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.example.exodus.gamelogic.GameState;
+
 /**
  * Created by 여성우 on 2018-05-16.
  */
@@ -29,7 +31,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
         m_thread = new GameViewThread(getHolder(), this);
 
-        //ChangeGameState(new GameState());
+        ChangeGameState(new GameState());
     }
 
     //@Override
@@ -70,8 +72,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        m_state.onKeyDown(keyCode, event);
-        return super.onKeyDown(keyCode, event);
+        return m_state.onKeyDown(keyCode, event);
+        //return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+
+        //return super.onKeyUp(keyCode, event);
+        return m_state.onKeyUp(keyCode, event);
     }
 
     @Override
