@@ -8,6 +8,8 @@ import android.view.WindowManager;
 
 import com.example.exodus.framework.GameView;
 
+import java.io.IOException;
+
 public class MainActivity extends Activity {
 
     @Override
@@ -18,7 +20,11 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        setContentView(new GameView(this));
+        try {
+            setContentView(new GameView(this));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //setContentView(R.layout.activity_main);
     }
 }

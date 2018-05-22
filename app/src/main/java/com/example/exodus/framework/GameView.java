@@ -8,7 +8,12 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.example.exodus.R;
 import com.example.exodus.gamelogic.GameState;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * Created by 여성우 on 2018-05-16.
@@ -19,7 +24,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private IState          m_state;
 
 
-    public GameView(Context context) {
+    public GameView(Context context) throws IOException {
         super(context);
 
         AppManager.getInstance().setGameview(this);
@@ -32,6 +37,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         m_thread = new GameViewThread(getHolder(), this);
 
         ChangeGameState(new GameState());
+        InputStream is = getResources().getAssets().open("test.csv");
+        List<int[]> tmp = CSVReader.read(is);
     }
 
     //@Override
