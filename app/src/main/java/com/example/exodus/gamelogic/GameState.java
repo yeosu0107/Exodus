@@ -21,7 +21,7 @@ public class GameState implements IState{
         m_player = new Player[MAX_PLAYER];
         for(int i=0; i<MAX_PLAYER; ++i) {
             m_player[i] = new Player();
-            m_player[i].setting(i*90, 0);
+            m_player[i].setting(i*150, i*168);
         }
         m_player[0].setState(Player.idle);
     }
@@ -39,9 +39,12 @@ public class GameState implements IState{
             cur.ResetCollside();
         }
         CollisionManager.checkBoxtoBox(m_player[0].m_collBox, m_player[1].m_collBox);
-        //for(int i = 0; i < MAX_PLAYER; ++i)
-        //    for(int j = i + 1; j < MAX_PLAYER; ++j)
-        //        CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox);
+        for(int i = 0; i < MAX_PLAYER; ++i)
+            for(int j = i + 1; j < MAX_PLAYER; ++j)
+                CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox);
+
+        for(int i = 0; i < MAX_PLAYER - 1; ++i)
+            m_player[i].move(0, 10);
     }
 
     @Override
@@ -58,9 +61,12 @@ public class GameState implements IState{
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == event.KEYCODE_W) {
-
+            m_player[0].setState(Player.run);
+            m_player[0].move(0, -10);
         }
         if(keyCode == event.KEYCODE_S) {
+            m_player[0].setState(Player.run);
+            m_player[0].move(0, 10);
         }
         if(keyCode == event.KEYCODE_A) {
             m_player[0].setDir(1);

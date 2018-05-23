@@ -18,12 +18,12 @@ public class CollisionBox {
     public Paint m_Paint;
 
     public int m_Collside;
-    public int m_Scale = 2;
+    public int m_Scale = 3;
 
     public CollisionBox(Rect rect) {
         m_ColliisionBox = new Rect(rect);
         m_Collside = 0;
-        m_Size = new Point(rect.width(), rect.height()* m_Scale);
+        m_Size = new Point(rect.width() * m_Scale, rect.height()* m_Scale);
         m_ColliisionBox.right = m_ColliisionBox.left + m_Size.x;
         m_ColliisionBox.bottom = m_ColliisionBox.top + m_Size.y;
 
@@ -35,7 +35,7 @@ public class CollisionBox {
 
     public void SetPosition(int x, int y) {
         // offsetTo 함수를 통해 충돌박스 위치를 Left, Top위치로 이동
-        m_ColliisionBox.offsetTo(x, y);
+        m_ColliisionBox.offsetTo(x , y );
     }
 
     public void DrawCollisionBox(Canvas canvas) {

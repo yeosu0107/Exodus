@@ -18,20 +18,44 @@ public class CollisionManager {
         Rect collBox2 = new Rect(box2.m_ColliisionBox);
         Rect collChectBox = new Rect();
 
-        if(!collBox1.intersect(collBox2))
-            return false;
+        int distance = 0;
+        int collside1 = 0;
+        int collside2 = 0;
+
+        if(!collBox1.intersect(collBox2)) return false;
 
         collChectBox.setIntersect(collBox1, collBox2);
-        if(collChectBox.centerX() <= box1.m_ColliisionBox.centerX()) box1.m_Collside += SIDE_LEFT;
-        else box1.m_Collside += SIDE_RIGHT;
 
-        Log.d("originX", String.valueOf(box1.m_ColliisionBox.centerX()));
-        Log.d("CollX",  String.valueOf(collChectBox.centerX()));
-        Log.d("CollSide",  String.valueOf(box1.m_Collside));
+        if(collChectBox.centerY() < box1.m_ColliisionBox.centerY()) {
+            collside1 |= SIDE_TOP;
+            collside2 |= SIDE_BOTTOM;
+            distance = Length(collChectBox.centerY(), box1.m_ColliisionBox.centerY());
+        }
+        if(collChectBox.centerY() > box1.m_ColliisionBox.centerY()) {
+            collside1 |= SIDE_BOTTOM;
+            collside2 |= SIDE_TOP;
+            distance = Length(collChectBox.centerY(), box1.m_ColliisionBox.centerY());
 
-        if(collChectBox.centerY() < box1.m_ColliisionBox.centerY()) box1.m_Collside += SIDE_TOP;
-        if(collChectBox.centerY() > box1.m_ColliisionBox.centerY()) box1.m_Collside += SIDE_BOTTOM;
+        }
 
-        return false;
+        if(collChectBox.centerX() <= box1.m_ColliisionBox.centerX()) {
+            if(distance < Length(collChectBox.centerX(), box1.m_ColliisionBox.centerX())) {
+                collside1 = SIDE_LEFT;
+                collside2 = SIDE_RIGHT;
+            }
+        }
+        else {
+            if(distance < Length(collChectBox.centerX(), box1.m_ColliisionBox.centerX())) {
+                collside1 = SIDE_RIGHT;
+                collside2 = SIDE_LEFT;
+            }
+        }
+        box1.m_Collside |= collside1;
+        box2.m_Collside |= collside2;
+        return true;
+    }
+
+    public static int Length(int x1, int x2) {
+        return (x1 - x2) * (x1 - x2);
     }
 }
