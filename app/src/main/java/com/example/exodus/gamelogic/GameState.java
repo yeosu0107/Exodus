@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
+import com.example.exodus.framework.CollisionManager;
 import com.example.exodus.framework.IState;
 
 /**
@@ -12,12 +13,13 @@ import com.example.exodus.framework.IState;
 
 public class GameState implements IState{
 
+    final int MAX_PLAYER = 6;
     private Player[] m_player;
 
     @Override
     public void Init() {
-        m_player = new Player[6];
-        for(int i=0; i<6; ++i) {
+        m_player = new Player[MAX_PLAYER];
+        for(int i=0; i<MAX_PLAYER; ++i) {
             m_player[i] = new Player();
             m_player[i].setting(i*90, 0);
         }
@@ -34,7 +36,12 @@ public class GameState implements IState{
         long time = System.currentTimeMillis();
         for(Player cur : m_player) {
             cur.update(time);
+            cur.ResetCollside();
         }
+        CollisionManager.checkBoxtoBox(m_player[0].m_collBox, m_player[1].m_collBox);
+        //for(int i = 0; i < MAX_PLAYER; ++i)
+        //    for(int j = i + 1; j < MAX_PLAYER; ++j)
+        //        CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox);
     }
 
     @Override

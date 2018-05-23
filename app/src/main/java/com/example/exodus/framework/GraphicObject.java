@@ -13,14 +13,10 @@ public class GraphicObject {
     protected int     m_x;
     protected int     m_y;
 
-
-    public Rect m_boundBox;
-
     public GraphicObject(Bitmap bitmap) {
         m_bit = bitmap;
         m_x = 0;
         m_y = 0;
-        m_boundBox=new Rect();
     }
 
     public void draw(Canvas canvas) {
