@@ -1,12 +1,12 @@
 package com.example.exodus.gamelogic;
+import com.example.exodus.BlockObject;
+import com.example.exodus.framework.CollisionBox;
+
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-
-import com.example.exodus.BlockObject;
-import com.example.exodus.framework.CollisionBox;
 
 import com.example.exodus.R;
 import com.example.exodus.framework.AppManager;
