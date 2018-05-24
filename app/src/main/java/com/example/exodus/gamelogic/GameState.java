@@ -23,7 +23,6 @@ public class GameState implements IState{
 
     final int MAX_PLAYER = 6;
     private Player[] m_player;
-    private CollisionBox m_groundCollBox;
     private BlockObject m_testblock;
 
     private MapObject m_map;
@@ -34,10 +33,9 @@ public class GameState implements IState{
         m_player = new Player[MAX_PLAYER];
         for(int i=0; i<MAX_PLAYER; ++i) {
             m_player[i] = new Player();
-            m_player[i].setting(i*150, i*168);
+            m_player[i].setting(i*150, 0);
         }
         m_player[0].setState(Player.idle);
-        m_groundCollBox = new CollisionBox(new Rect(0, 1030, 1920, 1080 ));
         m_testblock = new BlockObject();
         m_testblock.setting(150,300);
         m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(0));
@@ -57,15 +55,14 @@ public class GameState implements IState{
             cur.ResetCollside();
         }
         m_testblock.ResetCollside();
-        //CollisionManager.checkBoxtoBox(m_player[0].m_collBox, m_player[1].m_collBox);
+
         for(int i = 0; i < MAX_PLAYER; ++i) {
-            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_groundCollBox);
+            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_map.m_Collbox);
             for (int j = i + 1; j < MAX_PLAYER; ++j)
                 CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox);
             CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_testblock.m_collBox);
         }
-        CollisionManager.checkBoxtoBox(m_testblock.m_collBox, m_groundCollBox);
-
+        CollisionManager.checkBoxtoBox(m_testblock.m_collBox, m_map.m_Collbox);
         for(int i = 0; i < MAX_PLAYER; ++i)
             m_player[i].move(0, 10);
 
@@ -79,7 +76,6 @@ public class GameState implements IState{
         m_map.draw(canvas);
 
         for(Player cur : m_player) {
-            m_groundCollBox.DrawCollisionBox(canvas);
             m_testblock.draw(canvas);
             cur.draw(canvas);
             if(cur == m_player[0]) {
