@@ -2,7 +2,9 @@ package com.example.exodus;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -19,12 +21,21 @@ public class MainActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        getHeight();
         try {
             setContentView(new GameView(this));
         } catch (IOException e) {
             e.printStackTrace();
         }
         //setContentView(R.layout.activity_main);
+    }
+
+    private void getHeight() {
+        Rect rect = new Rect();
+        Window win = this.getWindow();
+        win.getDecorView().getWindowVisibleDisplayFrame(rect);
+
+        Log.d("linsoo","알림바:"+rect.top);
+        Log.d("linsoo","화면전체너비:"+rect.right);
     }
 }

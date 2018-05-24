@@ -18,7 +18,7 @@ public class CollisionBox {
     public Paint m_Paint;
 
     public int m_Collside;
-    public int m_Scale = 3;
+    public int m_Scale = 2;
 
     public CollisionBox(Rect rect) {
         m_ColliisionBox = new Rect(rect);

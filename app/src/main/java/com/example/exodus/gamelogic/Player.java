@@ -23,6 +23,8 @@ public class Player{
     private int m_x, m_y;
     public CollisionBox m_collBox;
 
+    static public final int GROUND_YPOS = 1080;
+
     public static final int unclick = 8;
     public static final int idle = 0;
     public static final int run = 2;
@@ -99,8 +101,8 @@ public class Player{
         else if( y < 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_TOP)) y = 0;
 
         m_x += x;
-        Log.d("Direction", String.valueOf(m_collBox.m_Collside));
         m_y += y;
+
         m_ani[m_state + m_dir].setPosition(m_x, m_y);
         m_collBox.Move(x,y);
     }

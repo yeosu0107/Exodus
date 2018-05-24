@@ -35,7 +35,6 @@ public class CollisionManager {
             collside1 |= SIDE_BOTTOM;
             collside2 |= SIDE_TOP;
             distance = Length(collChectBox.centerY(), box1.m_ColliisionBox.centerY());
-
         }
 
         if(collChectBox.centerX() <= box1.m_ColliisionBox.centerX()) {
@@ -50,11 +49,14 @@ public class CollisionManager {
                 collside2 = SIDE_LEFT;
             }
         }
+
+        if(collBox1.left <= 0) collside1 |= SIDE_LEFT;
+        if(collBox1.right >= (1794)) collside1 |= SIDE_RIGHT;
+
         box1.m_Collside |= collside1;
         box2.m_Collside |= collside2;
         return true;
     }
-
     public static int Length(int x1, int x2) {
         return (x1 - x2) * (x1 - x2);
     }
