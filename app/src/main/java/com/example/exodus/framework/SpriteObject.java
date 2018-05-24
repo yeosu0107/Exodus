@@ -3,13 +3,14 @@ package com.example.exodus.framework;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.util.Log;
 
 /**
  * Created by 여성우 on 2018-05-17.
  */
 
 public class SpriteObject extends GraphicObject{
-    private Rect m_rectangle;
+    public Rect m_rectangle;
 
     private int  m_fps;
     private int  m_nFrame;

@@ -3,6 +3,7 @@ package com.example.exodus.framework;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -24,6 +25,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private IState          m_state;
 
 
+
     public GameView(Context context) throws IOException {
         super(context);
 
@@ -36,16 +38,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
         m_thread = new GameViewThread(getHolder(), this);
 
-        ChangeGameState(new GameState());
-        InputStream is = getResources().getAssets().open("test.csv");
+        InputStream is = getResources().getAssets().open("startMap.csv");
         List<int[]> tmp = CSVReader.read(is);
+        AppManager.getInstance().addMap(tmp);
+
+        ChangeGameState(new GameState());
+
+
+
+
     }
 
     //@Override
     protected void MyonDraw(Canvas canvas) {
         canvas.drawColor(Color.BLACK);
 
+
         m_state.Render(canvas);
+
     }
 
     void Update() {

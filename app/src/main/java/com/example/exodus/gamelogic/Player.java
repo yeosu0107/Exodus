@@ -2,9 +2,12 @@ package com.example.exodus.gamelogic;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.Log;
 
 import com.example.exodus.R;
 import com.example.exodus.framework.AppManager;
+import com.example.exodus.framework.CollisionBox;
+import com.example.exodus.framework.CollisionManager;
 import com.example.exodus.framework.SpriteObject;
 
 /**
@@ -13,12 +16,12 @@ import com.example.exodus.framework.SpriteObject;
 
 public class Player{
     private SpriteObject[] m_ani;
-
     private int m_state;
     private int m_dir;
     private boolean m_clear;
 
     private int m_x, m_y;
+    public CollisionBox m_collBox;
 
     public static final int unclick = 8;
     public static final int idle = 0;
@@ -51,6 +54,7 @@ public class Player{
         this.setPosition(0,0);
         m_state = unclick;
         m_dir = 0;
+        m_collBox = new CollisionBox(m_ani[0].m_rectangle);
     }
 
     public void setting(int x, int y) {
@@ -58,15 +62,18 @@ public class Player{
         m_state = unclick;
         this.setPosition(x, y);
         m_ani[m_state].setPosition(x, y);
+        m_collBox.SetPosition(x,y);
     }
 
     public void draw(Canvas canvas) {
         if(m_clear)
             return;
+        m_collBox.DrawCollisionBox(canvas);
         if(m_state == unclick)
             m_ani[m_state].draw(canvas);
         else
             m_ani[m_state + m_dir].draw(canvas);
+
     }
 
     public void update(long time) {
@@ -81,12 +88,25 @@ public class Player{
     public void setPosition(int x, int y) {
         m_x = x;
         m_y = y;
+        if(m_collBox != null)
+            m_collBox.SetPosition(x, y);
     }
 
     public void move(int x, int y) {
+        if(x > 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_RIGHT)) x = 0;
+        else if(x < 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_LEFT)) x = 0;
+        if( y > 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_BOTTOM)) y = 0 ;
+        else if( y < 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_TOP)) y = 0;
+
         m_x += x;
+        Log.d("Direction", String.valueOf(m_collBox.m_Collside));
         m_y += y;
         m_ani[m_state + m_dir].setPosition(m_x, m_y);
+        m_collBox.Move(x,y);
+    }
+
+    public void ResetCollside() {
+        m_collBox.Reset();
     }
 
     public void setState(int state) {
