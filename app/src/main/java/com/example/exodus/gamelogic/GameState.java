@@ -1,23 +1,16 @@
 package com.example.exodus.gamelogic;
-import android.content.Context;
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
-<<<<<<< HEAD
+
 import com.example.exodus.R;
 import com.example.exodus.framework.AppManager;
 import com.example.exodus.framework.BackGround;
-import com.example.exodus.framework.CSVReader;
-=======
 import com.example.exodus.framework.CollisionManager;
->>>>>>> c90e3a865c590f39cf3870606ca25f29b4b92001
 import com.example.exodus.framework.IState;
 import com.example.exodus.framework.MapObject;
-
-import java.io.InputStream;
-import java.util.List;
 
 /**
  * Created by 여성우 on 2018-05-17.
