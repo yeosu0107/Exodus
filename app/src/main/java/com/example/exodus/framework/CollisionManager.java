@@ -13,7 +13,7 @@ public class CollisionManager {
     static public final int SIDE_TOP = 4;
     static public final int SIDE_BOTTOM = 8;
 
-    public static boolean checkBoxtoBox(CollisionBox box1, CollisionBox box2) {
+    public static boolean checkBoxtoBox(CollisionBox box1, CollisionBox box2, boolean isJam) {
         Rect collBox1 = new Rect(box1.m_ColliisionBox);
         Rect collBox2 = new Rect(box2.m_ColliisionBox);
         Rect collChectBox = new Rect();
@@ -23,6 +23,7 @@ public class CollisionManager {
         int collside2 = 0;
 
         if(!collBox1.intersect(collBox2)) return false;
+        if(isJam == true) return true;
 
         collChectBox.setIntersect(collBox1, collBox2);
 

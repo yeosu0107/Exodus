@@ -1,5 +1,6 @@
 package com.example.exodus;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
@@ -15,18 +16,26 @@ import com.example.exodus.framework.SpriteObject;
 
 public class BlockObject {
 
-    public CollisionBox m_collBox;
+    static public final int FLAG_HOLDING = 1;
+    static public final int FLAG_NO_CHANGE_SPRITE = 2;
+    static public final int FLAG_NO_COLLISION_BOX = 4;
 
+    public CollisionBox m_collBox;
+    private boolean m_drawable = true;
+    private int m_Flags = 0;
     private int m_x, m_y;
     private SpriteObject m_Texture;
 
-    public BlockObject() {
+    public BlockObject(Bitmap bitmap, int FPS, int nFrame, int time, int flag) {
         this.setPosition(0,0);
 
-        m_Texture = new SpriteObject(AppManager.getInstance().getBitmap(R.drawable.crate));
-        m_Texture.initSpriteData(1, 1,2);
-
-        m_collBox = new CollisionBox(m_Texture.m_rectangle);
+        m_Flags = flag;
+        m_Texture = new SpriteObject(bitmap);
+        m_Texture.initSpriteData(FPS, nFrame,time);
+        if((m_Flags & FLAG_NO_COLLISION_BOX) > 0)
+            m_collBox = new CollisionBox(new Rect(0,0,0,0));
+        else
+            m_collBox = new CollisionBox(m_Texture.m_rectangle);
     }
 
     public void setting(int x, int y) {
@@ -36,11 +45,18 @@ public class BlockObject {
     }
 
     public void draw(Canvas canvas) {
+        if(!m_drawable) return;
         m_collBox.DrawCollisionBox(canvas);
         m_Texture.draw(canvas);
     }
 
     public void update(long time) {
+        if((m_Flags & FLAG_NO_CHANGE_SPRITE) == 0)
+            m_Texture.update(time);
+
+        if((m_Flags & FLAG_HOLDING) > 0)
+            return;
+
         // 오른쪽 충돌이 일어난 경우 왼쪽으로 밈
         if(!m_collBox.IsEnableMove(CollisionManager.SIDE_RIGHT)) move(-5,0);
         if(!m_collBox.IsEnableMove(CollisionManager.SIDE_LEFT)) move(10, 0);
@@ -52,6 +68,10 @@ public class BlockObject {
         m_y = y;
         if(m_collBox != null)
             m_collBox.SetPosition(x, y);
+    }
+
+    public void setDrawable(boolean able) {
+        m_drawable = able;
     }
 
     public void move(int x, int y) {

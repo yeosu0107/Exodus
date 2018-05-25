@@ -24,6 +24,7 @@ public class GameState implements IState{
     final int MAX_PLAYER = 6;
     private Player[] m_player;
     private BlockObject m_testblock;
+    private BlockObject m_Gem;
 
     private MapObject m_map;
     private BackGround m_back;
@@ -36,8 +37,11 @@ public class GameState implements IState{
             m_player[i].setting(i*150, 0);
         }
         m_player[0].setState(Player.idle);
-        m_testblock = new BlockObject();
+        m_testblock = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.crate), 1, 1, 2, 0);
         m_testblock.setting(150,300);
+        m_Gem = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.gem),
+                10, 5, 2, BlockObject.FLAG_HOLDING);
+        m_Gem.setting(100, 700);
         m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(0));
         m_back = new BackGround(AppManager.getInstance().getBitmap(R.drawable.back));
     }
@@ -57,16 +61,19 @@ public class GameState implements IState{
         m_testblock.ResetCollside();
 
         for(int i = 0; i < MAX_PLAYER; ++i) {
-            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_map.m_Collbox);
+            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_map.m_Collbox, false);
             for (int j = i + 1; j < MAX_PLAYER; ++j)
-                CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox);
-            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_testblock.m_collBox);
+                CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, false);
+            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_testblock.m_collBox, false);
+            if(CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_Gem.m_collBox, true))
+                m_Gem.setDrawable(false);
         }
-        CollisionManager.checkBoxtoBox(m_testblock.m_collBox, m_map.m_Collbox);
+        CollisionManager.checkBoxtoBox(m_testblock.m_collBox, m_map.m_Collbox, false);
         for(int i = 0; i < MAX_PLAYER; ++i)
             m_player[i].move(0, 10);
 
         m_testblock.update(time);
+        m_Gem.update(time);
     }
 
     @Override
@@ -83,6 +90,7 @@ public class GameState implements IState{
 
             }
         }
+        m_Gem.draw(canvas);
     }
 
     @Override
