@@ -2,6 +2,7 @@ package com.example.exodus;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 
 import com.example.exodus.framework.AppManager;
@@ -74,6 +75,8 @@ public class BlockObject {
         m_drawable = able;
     }
 
+    public boolean getDrawalbe() { return m_drawable; }
+
     public void move(int x, int y) {
         if(x > 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_RIGHT)) x = 0;
         else if(x < 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_LEFT)) x = 0;
@@ -90,4 +93,5 @@ public class BlockObject {
     public void ResetCollside() {
         m_collBox.Reset();
     }
+    public Point GetPosition() {return new Point(m_x, m_y); }
 }

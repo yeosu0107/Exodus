@@ -32,6 +32,20 @@ public class SpriteObject extends GraphicObject{
         m_currFrame = 0;
     }
 
+    public SpriteObject(SpriteObject other) {
+        super(other.m_bit);
+        m_rectangle= other.m_rectangle;
+        m_frameTimer = other.m_frameTimer;
+        m_fps = other.m_fps;
+        m_nFrame = other.m_nFrame;
+        m_currFrame = other.m_currFrame;
+        m_spriteWidth = other.m_spriteWidth;
+        m_spriteHeight = other.m_spriteHeight;
+        m_time = other.m_time;
+        m_bLoop = other.m_bLoop;
+        m_bEnd = other.m_bEnd;
+    }
+
     public void initSpriteData(int theFPS, int nFrame, int time) { //fps, 프레임갯수, 확대배율
         m_spriteWidth = m_bit.getWidth() / nFrame;
         m_spriteHeight = m_bit.getHeight();
@@ -43,12 +57,15 @@ public class SpriteObject extends GraphicObject{
     }
 
     public void update(long time) {
+        if(m_bEnd) return;
         if(time>m_frameTimer + m_fps) {
             //이전시간 + m_fps보다 크면 다음 프레임으로
             m_frameTimer = time;
             m_currFrame += 1;
-            if(m_currFrame >= m_nFrame)
+            if(m_currFrame >= m_nFrame) {
+                m_bEnd = !m_bLoop;
                 m_currFrame = 0;
+            }
         }
     }
 
@@ -62,4 +79,9 @@ public class SpriteObject extends GraphicObject{
 
         canvas.drawBitmap(m_bit, m_rectangle, dest, null);
     }
+
+    public void Start() { m_bLoop = true; }
+    public void SetLoop(boolean loop) { m_bLoop = loop;}
+    public boolean IsEnd() { return m_bEnd; }
+
 }

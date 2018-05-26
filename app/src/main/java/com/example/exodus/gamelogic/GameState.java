@@ -12,6 +12,7 @@ import com.example.exodus.R;
 import com.example.exodus.framework.AppManager;
 import com.example.exodus.framework.BackGround;
 import com.example.exodus.framework.CollisionManager;
+import com.example.exodus.framework.EffectManagement;
 import com.example.exodus.framework.IState;
 import com.example.exodus.framework.MapObject;
 
@@ -28,6 +29,7 @@ public class GameState implements IState{
 
     private MapObject m_map;
     private BackGround m_back;
+    private EffectManagement m_Effect;
 
     @Override
     public void Init() {
@@ -44,6 +46,8 @@ public class GameState implements IState{
         m_Gem.setting(100, 700);
         m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(0));
         m_back = new BackGround(AppManager.getInstance().getBitmap(R.drawable.back));
+        m_Effect = new EffectManagement();
+        m_Effect.BuildObjects();
     }
 
     @Override
@@ -65,8 +69,12 @@ public class GameState implements IState{
             for (int j = i + 1; j < MAX_PLAYER; ++j)
                 CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, false);
             CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_testblock.m_collBox, false);
-            if(CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_Gem.m_collBox, true))
-                m_Gem.setDrawable(false);
+            if(m_Gem.getDrawalbe()) {
+                if(CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_Gem.m_collBox, true)) {
+                    m_Gem.setDrawable(false);
+                    m_Effect.StartStarEffect(m_Gem.GetPosition());
+                }
+            }
         }
         CollisionManager.checkBoxtoBox(m_testblock.m_collBox, m_map.m_Collbox, false);
         for(int i = 0; i < MAX_PLAYER; ++i)
@@ -74,6 +82,7 @@ public class GameState implements IState{
 
         m_testblock.update(time);
         m_Gem.update(time);
+        m_Effect.Update(time);
     }
 
     @Override
@@ -91,6 +100,7 @@ public class GameState implements IState{
             }
         }
         m_Gem.draw(canvas);
+        m_Effect.draw(canvas);
     }
 
     @Override
