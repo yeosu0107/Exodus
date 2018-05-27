@@ -23,9 +23,12 @@ import com.example.exodus.framework.MapObject;
 public class GameState implements IState{
 
     final int MAX_PLAYER = 6;
+
+    private int m_NumofGem = 1;
     private Player[] m_player;
     private BlockObject m_testblock;
     private BlockObject m_Gem;
+    private BlockObject m_Door;
 
     private MapObject m_map;
     private BackGround m_back;
@@ -41,9 +44,14 @@ public class GameState implements IState{
         m_player[0].setState(Player.idle);
         m_testblock = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.crate), 1, 1, 2, 0);
         m_testblock.setting(150,300);
+
+        m_Door = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.door), 1, 2, 1,
+                BlockObject.FLAG_HOLDING | BlockObject.FLAG_NO_CHANGE_SPRITE);
+        m_Door.setting(400,300);
+
         m_Gem = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.gem),
                 10, 5, 2, BlockObject.FLAG_HOLDING);
-        m_Gem.setting(100, 700);
+        m_Gem.setting(100, 600);
         m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(0));
         m_back = new BackGround(AppManager.getInstance().getBitmap(R.drawable.back));
         m_Effect = new EffectManagement();
@@ -72,6 +80,8 @@ public class GameState implements IState{
         }
 
         EndCollside();
+        if(m_NumofGem == 0)
+            m_Door.SetSpriteFrame(1);
 
         m_testblock.update(time);
         m_Gem.update(time);
@@ -87,6 +97,7 @@ public class GameState implements IState{
                 if(CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_Gem.m_collBox, true)) {
                     m_Gem.setDrawable(false);
                     m_Effect.StartStarEffect(m_Gem.GetPosition());
+                    m_NumofGem--;
                 }
             }
         }
@@ -115,6 +126,7 @@ public class GameState implements IState{
             }
         }
         m_Gem.draw(canvas);
+        m_Door.draw(canvas);
         m_Effect.draw(canvas);
     }
 
@@ -124,7 +136,6 @@ public class GameState implements IState{
             if(m_player[0].State() != Player.jumpdown) {
                 Log.d("IsJump", String.valueOf(m_player[0].State()));
                 m_player[0].setState(Player.jumpup);
-                m_player[0].move(0, 10);
             }
         }
         if(moveX == 0) {
@@ -154,7 +165,6 @@ public class GameState implements IState{
         if(keyCode == event.KEYCODE_W) {
             if(m_player[0].IsJump())
                 m_player[0].setState(Player.run);
-            m_player[0].move(0, -10);
         }
         if(keyCode == event.KEYCODE_S) {
             if(m_player[0].IsJump())
@@ -178,7 +188,7 @@ public class GameState implements IState{
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        m_player[0].setState(Player.idle);
+        //m_player[0].setState(Player.idle);
         return true;
     }
 

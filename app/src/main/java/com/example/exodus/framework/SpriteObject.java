@@ -80,6 +80,7 @@ public class SpriteObject extends GraphicObject{
         canvas.drawBitmap(m_bit, m_rectangle, dest, null);
     }
 
+    public void SetSpriteFrame(int frame) { m_currFrame = frame; }
     public void Start() { m_bLoop = true; }
     public void SetLoop(boolean loop) { m_bLoop = loop;}
     public boolean IsEnd() { return m_bEnd; }

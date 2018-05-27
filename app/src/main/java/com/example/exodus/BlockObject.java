@@ -36,7 +36,7 @@ public class BlockObject {
         if((m_Flags & FLAG_NO_COLLISION_BOX) > 0)
             m_collBox = new CollisionBox(new Rect(0,0,0,0), 1);
         else
-            m_collBox = new CollisionBox(m_Texture.m_rectangle, 2);
+            m_collBox = new CollisionBox(m_Texture.m_rectangle, time);
     }
 
     public void setting(int x, int y) {
@@ -74,6 +74,8 @@ public class BlockObject {
     public void setDrawable(boolean able) {
         m_drawable = able;
     }
+
+    public void SetSpriteFrame(int frame) { m_Texture.SetSpriteFrame(frame); }
 
     public boolean getDrawalbe() { return m_drawable; }
 
