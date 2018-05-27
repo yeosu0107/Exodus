@@ -50,7 +50,7 @@ public class MapObject extends GraphicObject{
 
         for(int i=0; i<m_tiles.size(); ++i) {
             int[] line = m_tiles.get(i);
-            sliceX = AppManager.getInstance().getWidth() / line.length;
+            sliceX = AppManager.getInstance().getWidth() / (line.length - 1);
             for(int j=0; j<line.length; ++j) {
                 if(line[j] == -1)
                     continue;
