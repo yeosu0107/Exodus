@@ -22,7 +22,11 @@ public class CollisionManager {
         int collside1 = 0;
         int collside2 = 0;
 
-        if(!collBox1.intersect(collBox2)) return false;
+
+        if(collBox1.left <= 0) box1.m_Collside |= SIDE_LEFT;
+        if(collBox1.right >= (1794)) box1.m_Collside |= SIDE_RIGHT;
+
+        if(!Rect.intersects(collBox1, collBox2)) return false;
         if(isJam == true) return true;
 
         collChectBox.setIntersect(collBox1, collBox2);
@@ -39,6 +43,8 @@ public class CollisionManager {
         }
 
         if(collChectBox.centerX() <= box1.m_ColliisionBox.centerX()) {
+            Log.d("distance" , String.valueOf(distance));
+            Log.d("length" , String.valueOf(Length(collChectBox.centerX(), box1.m_ColliisionBox.centerX())));
             if(distance < Length(collChectBox.centerX(), box1.m_ColliisionBox.centerX())) {
                 collside1 = SIDE_LEFT;
                 collside2 = SIDE_RIGHT;
@@ -51,13 +57,11 @@ public class CollisionManager {
             }
         }
 
-        if(collBox1.left <= 0) collside1 |= SIDE_LEFT;
-        if(collBox1.right >= (1794)) collside1 |= SIDE_RIGHT;
-
         box1.m_Collside |= collside1;
         box2.m_Collside |= collside2;
         return true;
     }
+
     public static int Length(int x1, int x2) {
         return (x1 - x2) * (x1 - x2);
     }

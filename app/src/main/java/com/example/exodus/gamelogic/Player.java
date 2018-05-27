@@ -19,12 +19,13 @@ public class Player{
     private int m_state;
     private int m_dir;
     private boolean m_clear;
+    private int m_jumpHeight;
 
     private int m_x, m_y;
     public CollisionBox m_collBox;
 
-    static public final int GROUND_YPOS = 1080;
-
+    public static final int MAX_JUMP_HEIGHT = -150;
+    public static final int JUMP_SPEED = -10;
     public static final int unclick = 8;
     public static final int idle = 0;
     public static final int run = 2;
@@ -56,7 +57,8 @@ public class Player{
         this.setPosition(0,0);
         m_state = unclick;
         m_dir = 0;
-        m_collBox = new CollisionBox(m_ani[0].m_rectangle);
+        m_jumpHeight = 0;
+        m_collBox = new CollisionBox(m_ani[0].m_rectangle, 2);
     }
 
     public void setting(int x, int y) {
@@ -77,10 +79,22 @@ public class Player{
             m_ani[m_state + m_dir].draw(canvas);
 
     }
+    public boolean IsJump() {
+        return m_state != Player.jumpdown && m_state != Player.jumpup;
+    }
 
     public void update(long time) {
         if(m_clear)
             return;
+        if(m_state == jumpup) {
+            move(0, JUMP_SPEED);
+            m_jumpHeight += JUMP_SPEED;
+            if(m_jumpHeight < MAX_JUMP_HEIGHT || !m_collBox.IsEnableMove(CollisionManager.SIDE_TOP)) {
+                m_jumpHeight = 0;
+                m_state = jumpdown;
+            }
+
+        }
         if(m_state < unclick) {
             m_ani[m_state + m_dir].update(time);
             //m_ani[m_state + m_dir].setPosition(m_x, m_y);
@@ -97,8 +111,14 @@ public class Player{
     public void move(int x, int y) {
         if(x > 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_RIGHT)) x = 0;
         else if(x < 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_LEFT)) x = 0;
-        if( y > 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_BOTTOM)) y = 0 ;
+        if( y > 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_BOTTOM)) {
+            if(m_state == jumpdown)
+                m_state = idle;
+            y = 0 ;
+        }
         else if( y < 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_TOP)) y = 0;
+
+        if( y > 0) m_state = jumpdown;
 
         m_x += x;
         m_y += y;
@@ -107,8 +127,14 @@ public class Player{
         m_collBox.Move(x,y);
     }
 
+    public int State() { return m_state;}
+
     public void ResetCollside() {
         m_collBox.Reset();
+    }
+
+    public void EndCollision() {
+        m_collBox.EndCollision();
     }
 
     public void setState(int state) {

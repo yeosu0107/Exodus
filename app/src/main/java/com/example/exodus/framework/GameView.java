@@ -40,7 +40,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
         m_thread = new GameViewThread(getHolder(), this);
 
-        InputStream is = getResources().getAssets().open("startMap.csv");
+        InputStream is = getResources().getAssets().open("map_no2.csv");
         List<int[]> tmp = CSVReader.read(is);
         AppManager.getInstance().addMap(tmp);
 
@@ -53,7 +53,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     //@Override
     protected void MyonDraw(Canvas canvas) {
         canvas.drawColor(Color.BLACK);
-
 
         m_state.Render(canvas);
         if(m_stick.isDraw())

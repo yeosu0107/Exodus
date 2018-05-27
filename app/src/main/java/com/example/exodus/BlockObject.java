@@ -34,9 +34,9 @@ public class BlockObject {
         m_Texture = new SpriteObject(bitmap);
         m_Texture.initSpriteData(FPS, nFrame,time);
         if((m_Flags & FLAG_NO_COLLISION_BOX) > 0)
-            m_collBox = new CollisionBox(new Rect(0,0,0,0));
+            m_collBox = new CollisionBox(new Rect(0,0,0,0), 1);
         else
-            m_collBox = new CollisionBox(m_Texture.m_rectangle);
+            m_collBox = new CollisionBox(m_Texture.m_rectangle, 2);
     }
 
     public void setting(int x, int y) {
@@ -93,5 +93,6 @@ public class BlockObject {
     public void ResetCollside() {
         m_collBox.Reset();
     }
+    public void EndCollision() { m_collBox.EndCollision();}
     public Point GetPosition() {return new Point(m_x, m_y); }
 }

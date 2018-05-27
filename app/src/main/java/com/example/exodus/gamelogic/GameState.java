@@ -1,4 +1,4 @@
-package com.example.exodus.gamelogic;
+﻿package com.example.exodus.gamelogic;
 import com.example.exodus.BlockObject;
 import com.example.exodus.framework.CollisionBox;
 
@@ -64,8 +64,22 @@ public class GameState implements IState{
         }
         m_testblock.ResetCollside();
 
+        CollisionCheck();
+
         for(int i = 0; i < MAX_PLAYER; ++i) {
-            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_map.m_Collbox, false);
+            if(m_player[i].State() != Player.jumpup)
+                m_player[i].move(0, 10);
+        }
+
+        EndCollside();
+
+        m_testblock.update(time);
+        m_Gem.update(time);
+        m_Effect.Update(time);
+    }
+    public void CollisionCheck() {
+        for(int i = 0; i < MAX_PLAYER; ++i) {
+            m_map.CollisionCheck(m_player[i].m_collBox);
             for (int j = i + 1; j < MAX_PLAYER; ++j)
                 CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, false);
             CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_testblock.m_collBox, false);
@@ -76,14 +90,15 @@ public class GameState implements IState{
                 }
             }
         }
-        CollisionManager.checkBoxtoBox(m_testblock.m_collBox, m_map.m_Collbox, false);
-        for(int i = 0; i < MAX_PLAYER; ++i)
-            m_player[i].move(0, 10);
-
-        m_testblock.update(time);
-        m_Gem.update(time);
-        m_Effect.Update(time);
+        m_map.CollisionCheck(m_testblock.m_collBox);
     }
+    public void EndCollside() {
+        for(Player cur : m_player) {
+            cur.EndCollision();
+        }
+        m_testblock.EndCollision();
+    }
+
 
     @Override
     public void Render(Canvas canvas) {
@@ -106,19 +121,29 @@ public class GameState implements IState{
     @Override
     public void MovePlayers(boolean isJump, int moveX) {
         if(isJump) {
-
+            if(m_player[0].State() != Player.jumpdown) {
+                Log.d("IsJump", String.valueOf(m_player[0].State()));
+                m_player[0].setState(Player.jumpup);
+                m_player[0].move(0, 10);
+            }
         }
         if(moveX == 0) {
-            m_player[0].setState(Player.idle);
+            if(m_player[0].IsJump()) {
+                m_player[0].setState(Player.idle);
+            }
         }
         else if(moveX > 0) {
             m_player[0].setDir(0);
-            m_player[0].setState(Player.run);
+            if(m_player[0].IsJump()) {
+                m_player[0].setState(Player.run);
+            }
             m_player[0].move(10, 0);
         }
         else if(moveX< 0) {
             m_player[0].setDir(1);
-            m_player[0].setState(Player.run);
+            if(m_player[0].IsJump()) {
+                m_player[0].setState(Player.run);
+            }
             m_player[0].move(-10, 0);
         }
 
@@ -127,21 +152,25 @@ public class GameState implements IState{
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == event.KEYCODE_W) {
-            m_player[0].setState(Player.run);
+            if(m_player[0].IsJump())
+                m_player[0].setState(Player.run);
             m_player[0].move(0, -10);
         }
         if(keyCode == event.KEYCODE_S) {
-            m_player[0].setState(Player.run);
+            if(m_player[0].IsJump())
+                m_player[0].setState(Player.run);
             m_player[0].move(0, 10);
         }
         if(keyCode == event.KEYCODE_A) {
             m_player[0].setDir(1);
-            m_player[0].setState(Player.run);
+            if(m_player[0].IsJump())
+                m_player[0].setState(Player.run);
             m_player[0].move(-10, 0);
         }
         if(keyCode == event.KEYCODE_D) {
             m_player[0].setDir(0);
-            m_player[0].setState(Player.run);
+            if(m_player[0].IsJump())
+                m_player[0].setState(Player.run);
             m_player[0].move(10, 0);
         }
         return true;
