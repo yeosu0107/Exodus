@@ -14,7 +14,7 @@ public class BackGround extends GraphicObject {
     public BackGround(Bitmap bitmap) {
         super(bitmap);
         m_rect = new Rect(0,0, m_bit.getWidth(), m_bit.getHeight());
-        m_dest = new Rect(0,0,1920, 1080);
+        m_dest = new Rect(0,0,AppManager.getInstance().getWidth(), AppManager.getInstance().getHeight());
     }
 
     @Override

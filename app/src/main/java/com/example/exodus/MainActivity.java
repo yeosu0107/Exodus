@@ -2,12 +2,15 @@ package com.example.exodus;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.example.exodus.framework.AppManager;
 import com.example.exodus.framework.GameView;
 
 import java.io.IOException;
@@ -22,12 +25,20 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getHeight();
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        AppManager.getInstance().setScreenSize(size.x, size.y);
+
         try {
             setContentView(new GameView(this));
         } catch (IOException e) {
             e.printStackTrace();
         }
         //setContentView(R.layout.activity_main);
+
+
     }
 
     private void getHeight() {

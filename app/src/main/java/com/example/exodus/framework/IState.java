@@ -14,7 +14,10 @@ public interface IState {
     public void Update();
     public void Render(Canvas canvas);
 
+    public void MovePlayers(boolean isJump, int moveX);
+
     public boolean onKeyDown(int keyCode, KeyEvent event);
     public boolean onKeyUp(int keyCode, KeyEvent event);
     public boolean onTouchEvent(MotionEvent event);
+
 }

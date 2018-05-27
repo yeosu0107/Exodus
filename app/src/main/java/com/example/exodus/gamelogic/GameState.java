@@ -104,6 +104,27 @@ public class GameState implements IState{
     }
 
     @Override
+    public void MovePlayers(boolean isJump, int moveX) {
+        if(isJump) {
+
+        }
+        if(moveX == 0) {
+            m_player[0].setState(Player.idle);
+        }
+        else if(moveX > 0) {
+            m_player[0].setDir(0);
+            m_player[0].setState(Player.run);
+            m_player[0].move(10, 0);
+        }
+        else if(moveX< 0) {
+            m_player[0].setDir(1);
+            m_player[0].setState(Player.run);
+            m_player[0].move(-10, 0);
+        }
+
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == event.KEYCODE_W) {
             m_player[0].setState(Player.run);
@@ -123,20 +144,17 @@ public class GameState implements IState{
             m_player[0].setState(Player.run);
             m_player[0].move(10, 0);
         }
-        Log.d("down", "down"+event.getDownTime());
         return true;
     }
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         m_player[0].setState(Player.idle);
-        Log.d("up", "up");
         return true;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.d("touch", "touch" + event.getAction());
         return false;
     }
 }

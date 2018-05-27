@@ -11,6 +11,8 @@ import android.view.SurfaceView;
 
 import com.example.exodus.R;
 import com.example.exodus.gamelogic.GameState;
+import com.example.exodus.gamelogic.JumpButton;
+import com.example.exodus.gamelogic.VirtualJoystick;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +25,8 @@ import java.util.List;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private GameViewThread  m_thread;
     private IState          m_state;
-
-
+    private VirtualJoystick m_stick;
+    private JumpButton      m_jump;
 
     public GameView(Context context) throws IOException {
         super(context);
@@ -44,9 +46,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         ChangeGameState(new GameState());
 
-
-
-
+        m_stick = new VirtualJoystick();
+        m_jump = new JumpButton();
     }
 
     //@Override
@@ -55,7 +56,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
         m_state.Render(canvas);
-
+        if(m_stick.isDraw())
+            m_stick.render(canvas);
+        if(m_jump.isJump())
+            m_jump.draw(canvas);
     }
 
     void Update() {
@@ -102,7 +106,64 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        m_state.onTouchEvent(event);
+        if(!m_state.onTouchEvent(event)) { //state에서 터치이벤트가 없을 때만 발동
+            int move_x = 0;
+            final int action = event.getAction();
+
+            int pointerIndex = 0;
+            float multi_x, multi_y;
+            switch (action & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_DOWN: // 처음 터치가 눌러졌을 때
+                    if (event.getX() < AppManager.getInstance().getWidth() / 2) {
+                        m_stick.enableJoystick((int) event.getX(), (int) event.getY());
+                    } else {
+                        m_jump.setPosition((int) event.getX(), (int) event.getY());
+                        m_jump.setJump(true);
+                    }
+                    break;
+                case MotionEvent.ACTION_MOVE: // 터치가 눌린 상태에서 움직일 때
+                    if (event.getX() < AppManager.getInstance().getWidth() / 2) {
+                        move_x = m_stick.moveJoystick((int) event.getX(), (int) event.getY());
+                    } else {
+                        m_jump.setJump(true);
+                    }
+                    break;
+                case MotionEvent.ACTION_UP: // 터치가 떼어졌을 때
+                    if (event.getX() < AppManager.getInstance().getWidth() / 2) {
+                        m_stick.disableJoystick();
+                    } else {
+                        m_jump.setJump(false);
+                    }
+                    break;
+                case MotionEvent.ACTION_POINTER_DOWN: // 터치가 두 개 이상일 때 눌러졌을 때
+                    pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                    multi_x = event.getX(pointerIndex);
+                    multi_y = event.getY(pointerIndex);
+
+                    if (multi_x < AppManager.getInstance().getWidth() / 2) {
+                        m_stick.enableJoystick((int) multi_x, (int) multi_y);
+                    } else {
+                        m_jump.setPosition((int) multi_x, (int) multi_y);
+                        m_jump.setJump(true);
+                    }
+
+                    break;
+                case MotionEvent.ACTION_POINTER_UP: // 터치가 두 개 이상일 때 떼어졌을 때
+                    pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                    multi_x = event.getX(pointerIndex);
+
+                    if (multi_x < AppManager.getInstance().getWidth() / 2) {
+                        m_stick.disableJoystick();
+                    } else {
+                        m_jump.setJump(false);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            m_state.MovePlayers(m_jump.isJump(), move_x);
+        }
         return true;
     }
 

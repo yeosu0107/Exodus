@@ -20,6 +20,9 @@ public class AppManager {
     private Resources m_resource;
 
     private List<List<int[]>> m_mapList;
+
+    private int screen_width;
+    private int screen_height;
     //private GameState m_gamestate;
 
     public AppManager() {
@@ -45,6 +48,11 @@ public class AppManager {
         m_mapList.add(is);
     }
 
+    public void setScreenSize(int x, int y) {
+        screen_width = x;
+        screen_height = y;
+    }
+
     //public void setGameState(GameState state) {m_gamestate=state;}
 
     public  GameView getGameview() {
@@ -64,4 +72,7 @@ public class AppManager {
     public List<int[]> getMap(int index) {
        return m_mapList.get(index);
     }
+
+    public int getWidth() {return screen_width;}
+    public int getHeight() {return screen_height;}
 }

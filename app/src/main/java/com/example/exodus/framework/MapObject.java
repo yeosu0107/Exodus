@@ -32,7 +32,7 @@ public class MapObject extends GraphicObject{
 
     // 하나의 완성된 텍스쳐 생성 : 프레임 저하 방지
     public Bitmap CreateMapResource() {
-        Bitmap bit = Bitmap.createBitmap(1920, 1080,Bitmap.Config.ARGB_8888);
+        Bitmap bit = Bitmap.createBitmap(AppManager.getInstance().getWidth(), AppManager.getInstance().getHeight(),Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bit);
         MakeResource(canvas);
 
@@ -43,14 +43,14 @@ public class MapObject extends GraphicObject{
         Rect m_rectangle = new Rect(0,0,0,0);
 
         int sliceX = 0;
-        int sliceY = 1080 / m_tiles.size();
+        int sliceY = AppManager.getInstance().getHeight() / m_tiles.size();
 
         Rect collrect = new Rect(-1, -1, -1, -1);
         Rect dest = new Rect();
 
         for(int i=0; i<m_tiles.size(); ++i) {
             int[] line = m_tiles.get(i);
-            sliceX = 1920 / line.length;
+            sliceX = AppManager.getInstance().getWidth() / line.length;
             for(int j=0; j<line.length; ++j) {
                 if(line[j] == -1)
                     continue;
