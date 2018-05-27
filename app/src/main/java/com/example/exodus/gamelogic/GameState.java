@@ -1,4 +1,4 @@
-﻿package com.example.exodus.gamelogic;
+package com.example.exodus.gamelogic;
 import com.example.exodus.BlockObject;
 import com.example.exodus.framework.CollisionBox;
 
