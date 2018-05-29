@@ -37,8 +37,6 @@ public class CollisionBox {
         m_Paint.setColor(Color.WHITE);
     }
 
-    public CollisionBox() {  }
-
     public void SetPosition(int x, int y) {
         // offsetTo 함수를 통해 충돌박스 위치를 Left, Top위치로 이동
         m_ColliisionBox.offsetTo(x , y );

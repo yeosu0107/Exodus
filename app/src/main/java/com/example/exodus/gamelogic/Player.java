@@ -59,7 +59,7 @@ public class Player{
         m_state = unclick;
         m_dir = 0;
         m_jumpHeight = 0;
-        m_collBox = new CollisionBox(m_ani[0].m_rectangle, 2);
+        m_collBox = new CollisionBox(new Rect(0, 0, 32, 32), 2);
     }
 
     public void setting(int x, int y) {
@@ -128,6 +128,8 @@ public class Player{
         m_collBox.Move(x,y);
     }
 
+    public void SetClear(boolean isclear) { m_clear = isclear; }
+
     public int State() { return m_state;}
 
     public void ResetCollside() {
@@ -140,7 +142,11 @@ public class Player{
 
     public void setState(int state) {
         m_state = state;
-        m_ani[m_state + m_dir].setPosition(m_x, m_y);
+        if(state != unclick)
+            m_ani[m_state + m_dir].setPosition(m_x, m_y);
+        else
+            m_ani[m_state].setPosition(m_x, m_y);
+
     }
     public void setDir(int dir) {
         m_dir = dir;

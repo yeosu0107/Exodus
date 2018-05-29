@@ -97,12 +97,10 @@ public class MapObject extends GraphicObject{
     }
     @Override
     public void draw(Canvas canvas) {
-
-        for(int i = m_Collboxs.size(); i > 0; --i) {
-            m_Collboxs.get(i - 1).DrawCollisionBox(canvas);
-        }
+        //for(int i = m_Collboxs.size(); i > 0; --i) {
+        //    m_Collboxs.get(i - 1).DrawCollisionBox(canvas);
+        //}
         super.draw(canvas);
-
     }
 
     public void AddCollisionBox(Rect rect) {

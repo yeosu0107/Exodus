@@ -72,7 +72,7 @@ public class SpriteObject extends GraphicObject{
     @Override
     public void draw(Canvas canvas) {
         Rect dest = new Rect(m_x, m_y,
-                m_x + m_spriteWidth * m_time, m_y + m_spriteHeight * m_time);
+                m_x + 32 * m_time, m_y + 32 * m_time);
 
         m_rectangle.left = m_currFrame * m_spriteWidth;
         m_rectangle.right= m_rectangle.left + m_spriteWidth;

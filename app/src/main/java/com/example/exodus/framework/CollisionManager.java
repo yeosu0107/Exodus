@@ -24,7 +24,7 @@ public class CollisionManager {
 
 
         if(collBox1.left <= 0) box1.m_Collside |= SIDE_LEFT;
-        if(collBox1.right >= (1794)) box1.m_Collside |= SIDE_RIGHT;
+        if(collBox1.right >= (AppManager.getInstance().getWidth())) box1.m_Collside |= SIDE_RIGHT;
 
         if(!Rect.intersects(collBox1, collBox2)) return false;
         if(isJam == true) return true;

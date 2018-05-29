@@ -45,7 +45,7 @@ public class GameState implements IState{
         m_testblock = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.crate), 1, 1, 2, 0);
         m_testblock.setting(150,300);
 
-        m_Door = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.door), 1, 2, 1,
+        m_Door = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.door), 1, 2, 2,
                 BlockObject.FLAG_HOLDING | BlockObject.FLAG_NO_CHANGE_SPRITE);
         m_Door.setting(400,300);
 

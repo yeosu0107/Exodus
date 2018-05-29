@@ -36,7 +36,7 @@ public class BlockObject {
         if((m_Flags & FLAG_NO_COLLISION_BOX) > 0)
             m_collBox = new CollisionBox(new Rect(0,0,0,0), 1);
         else
-            m_collBox = new CollisionBox(m_Texture.m_rectangle, time);
+            m_collBox = new CollisionBox(new Rect(0,0,32,32), time);
     }
 
     public void setting(int x, int y) {
