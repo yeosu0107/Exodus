@@ -75,6 +75,6 @@ public class VirtualJoystick{
     }
 
     public int distX() {
-        return moveStick.getX() - now_x;
+        return (moveStick.getX()-move_size) - (now_x - back_size);
     }
 }

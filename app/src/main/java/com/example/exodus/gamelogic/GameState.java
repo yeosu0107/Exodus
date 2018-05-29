@@ -143,17 +143,17 @@ public class GameState implements IState{
                     cur.setState(Player.jumpup);
                 }
             }
-            if (moveX == 0) {
+            if (moveX >-40 && moveX<40) {
                 if (cur.IsJump()) {
                     cur.setState(Player.idle);
                 }
-            } else if (moveX > 0) {
+            } else if (moveX > 40) {
                 cur.setDir(0);
                 if (cur.IsJump()) {
                     cur.setState(Player.run);
                 }
                 cur.move(10, 0);
-            } else if (moveX < 0) {
+            } else if (moveX < -40) {
                 cur.setDir(1);
                 if (cur.IsJump()) {
                     cur.setState(Player.run);
