@@ -49,6 +49,7 @@ public class BlockObject {
         if(!m_drawable) return;
         m_collBox.DrawCollisionBox(canvas);
         m_Texture.draw(canvas);
+
     }
 
     public void update(long time) {
@@ -92,6 +93,8 @@ public class BlockObject {
         m_Texture.setPosition(m_x, m_y);
     }
 
+    public Rect CollisionBox() {return m_collBox.m_ColliisionBox;}
+    public int NowFrame() { return m_Texture.NowFrame(); }
     public void ResetCollside() {
         m_collBox.Reset();
     }

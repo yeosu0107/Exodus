@@ -13,7 +13,9 @@ public class CollisionManager {
     static public final int SIDE_TOP = 4;
     static public final int SIDE_BOTTOM = 8;
 
-    public static boolean checkBoxtoBox(CollisionBox box1, CollisionBox box2, boolean isJam) {
+    public static boolean checkBoxtoBox(CollisionBox box1, CollisionBox box2, boolean isMap) {
+        if(box1.m_DisableCollCheck || box2.m_DisableCollCheck) return false;
+
         Rect collBox1 = new Rect(box1.m_ColliisionBox);
         Rect collBox2 = new Rect(box2.m_ColliisionBox);
         Rect collChectBox = new Rect();
@@ -22,12 +24,10 @@ public class CollisionManager {
         int collside1 = 0;
         int collside2 = 0;
 
-
         if(collBox1.left <= 0) box1.m_Collside |= SIDE_LEFT;
         if(collBox1.right >= (AppManager.getInstance().getWidth())) box1.m_Collside |= SIDE_RIGHT;
 
         if(!Rect.intersects(collBox1, collBox2)) return false;
-        if(isJam == true) return true;
 
         collChectBox.setIntersect(collBox1, collBox2);
 
@@ -43,8 +43,6 @@ public class CollisionManager {
         }
 
         if(collChectBox.centerX() <= box1.m_ColliisionBox.centerX()) {
-            //Log.d("distance" , String.valueOf(distance));
-           // Log.d("length" , String.valueOf(Length(collChectBox.centerX(), box1.m_ColliisionBox.centerX())));
             if(distance < Length(collChectBox.centerX(), box1.m_ColliisionBox.centerX())) {
                 collside1 = SIDE_LEFT;
                 collside2 = SIDE_RIGHT;
@@ -57,6 +55,12 @@ public class CollisionManager {
             }
         }
 
+        AfterCollision(box1, collChectBox,collside1);
+
+        if(!isMap) {
+            AfterCollision(box2, collChectBox,collside2);
+        }
+
         box1.m_Collside |= collside1;
         box2.m_Collside |= collside2;
         return true;
@@ -64,5 +68,15 @@ public class CollisionManager {
 
     public static int Length(int x1, int x2) {
         return (x1 - x2) * (x1 - x2);
+    }
+
+    public static void AfterCollision(CollisionBox box, Rect collChectBox, int collside){
+        int newCollside = (~(box.m_Collside & collside)) & collside;
+
+        if((newCollside & SIDE_BOTTOM) > 0)
+            box.Move(0,-collChectBox.height() / 2);
+        if((newCollside & SIDE_TOP) > 0)
+            box.Move(0,collChectBox.height() / 2);
+
     }
 }

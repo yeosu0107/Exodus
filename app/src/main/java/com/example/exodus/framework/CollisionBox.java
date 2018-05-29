@@ -20,6 +20,7 @@ public class CollisionBox {
     public int m_Collside;
     public int m_PreCollside;
 
+    public boolean m_DisableCollCheck;
     public boolean m_NowCollcheck;  // 현재 충돌 체크 중인지 여부
     public int m_Scale = 2;
 
@@ -29,6 +30,7 @@ public class CollisionBox {
         m_Scale = scale;
         m_PreCollside = 0;
         m_NowCollcheck = true;
+        m_DisableCollCheck = false;
         m_Size = new Point(rect.width() * m_Scale, rect.height()* m_Scale);
         m_ColliisionBox.right = m_ColliisionBox.left + m_Size.x;
         m_ColliisionBox.bottom = m_ColliisionBox.top + m_Size.y;
@@ -40,6 +42,10 @@ public class CollisionBox {
     public void SetPosition(int x, int y) {
         // offsetTo 함수를 통해 충돌박스 위치를 Left, Top위치로 이동
         m_ColliisionBox.offsetTo(x , y );
+    }
+
+    public Point GetPosition() {
+        return new Point(m_ColliisionBox.left, m_ColliisionBox.top);
     }
 
     public void DrawCollisionBox(Canvas canvas) {

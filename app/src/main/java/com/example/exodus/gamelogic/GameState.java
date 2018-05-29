@@ -47,7 +47,7 @@ public class GameState implements IState{
 
         m_Door = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.door), 1, 2, 2,
                 BlockObject.FLAG_HOLDING | BlockObject.FLAG_NO_CHANGE_SPRITE);
-        m_Door.setting(400,300);
+        m_Door.setting(400,600);
 
         m_Gem = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.gem),
                 10, 5, 2, BlockObject.FLAG_HOLDING);
@@ -77,7 +77,7 @@ public class GameState implements IState{
         for(int i = 0; i < MAX_PLAYER; ++i) {
             if(m_player[i].State() != Player.jumpup) {
                 if (m_player[i].State() == Player.unclick) continue;
-                m_player[i].move(0, 10);
+                m_player[i].move(0, 8);
             }
         }
 
@@ -91,16 +91,26 @@ public class GameState implements IState{
     }
     public void CollisionCheck() {
         for(int i = 0; i < MAX_PLAYER; ++i) {
+            if(m_Door.NowFrame() == 2) {
+                if(Rect.intersects(m_player[i].CollisionBox(), m_Door.CollisionBox())) {
+                    m_player[i].SetClear(true);
+                }
+
+            }
+
             m_map.CollisionCheck(m_player[i].m_collBox);
             for (int j = i + 1; j < MAX_PLAYER; ++j)
                 CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, false);
-            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_testblock.m_collBox, false);
+
+            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_testblock.m_collBox, true);
+
             if(m_Gem.getDrawalbe()) {
-                if(CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_Gem.m_collBox, true)) {
+                if(Rect.intersects(m_player[i].CollisionBox(), m_Gem.CollisionBox())) {
                     m_Gem.setDrawable(false);
                     m_Effect.StartStarEffect(m_Gem.GetPosition());
                     m_NumofGem--;
                 }
+
             }
         }
         m_map.CollisionCheck(m_testblock.m_collBox);
@@ -200,7 +210,7 @@ public class GameState implements IState{
         boolean touched = false;
         if(event.getAction() != MotionEvent.ACTION_DOWN) return false;
         for(Player cur : m_player) {
-            Rect playerRect = cur.getCollisionBox();
+            Rect playerRect = cur.CollisionBox();
             if(playerRect.contains((int)event.getX(), (int)event.getY())) {
                 if (cur.State() != Player.unclick)
                     cur.setState(Player.unclick);
