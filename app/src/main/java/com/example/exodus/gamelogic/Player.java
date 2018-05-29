@@ -24,9 +24,9 @@ public class Player{
 
     private int m_x, m_y;
     public CollisionBox m_collBox;
+    public int MAX_JUMP_HEIGHT;
 
-    public static final int MAX_JUMP_HEIGHT = -150;
-    public static final int JUMP_SPEED = -10;
+    public static final int JUMP_SPEED = -8;
     public static final int unclick = 8;
     public static final int idle = 0;
     public static final int run = 2;
@@ -59,6 +59,7 @@ public class Player{
         m_state = unclick;
         m_dir = 0;
         m_jumpHeight = 0;
+        MAX_JUMP_HEIGHT = AppManager.getInstance().getTileHeight() * -4;
         m_collBox = new CollisionBox(new Rect(0, 0, AppManager.getInstance().getTileWidth(), AppManager.getInstance().getTileHeight()), 2);
     }
 
@@ -121,14 +122,21 @@ public class Player{
 
         if( y > 0) m_state = jumpdown;
 
-        m_x += x;
-        m_y += y;
+        m_collBox.Move(x, y);
+        m_x = m_collBox.GetPosition().x;
+        m_y = m_collBox.GetPosition().y;
+        //m_x += x;
+        //m_y += y;
 
         m_ani[m_state + m_dir].setPosition(m_x, m_y);
-        m_collBox.Move(x,y);
+
     }
 
-    public void SetClear(boolean isclear) { m_clear = isclear; }
+    public void SetClear(boolean isclear) {
+        m_state = unclick;
+        m_clear = isclear;
+        m_collBox.m_DisableCollCheck = true;
+    }
 
     public int State() { return m_state;}
 
@@ -150,10 +158,11 @@ public class Player{
     }
     public void setDir(int dir) {
         m_dir = dir;
-        m_ani[m_state + m_dir].setPosition(m_x, m_y);
+        if(m_state != unclick)
+            m_ani[m_state + m_dir].setPosition(m_x, m_y);
+        else
+            m_ani[m_state].setPosition(m_x, m_y);
     }
 
-    Rect getCollisionBox() {
-        return m_collBox.m_ColliisionBox;
-    }
+    public Rect CollisionBox() {return m_collBox.m_ColliisionBox;}
 }

@@ -92,7 +92,7 @@ public class MapObject extends GraphicObject{
 
     public void CollisionCheck(CollisionBox other) {
         for(int i = m_Collboxs.size(); i > 0; --i) {
-            CollisionManager.checkBoxtoBox(other, m_Collboxs.get(i - 1), false);
+            CollisionManager.checkBoxtoBox(other, m_Collboxs.get(i - 1), true);
         }
     }
     @Override
