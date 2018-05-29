@@ -29,6 +29,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private JumpButton      m_jump;
     private int             move_x;
 
+    final int MAX_MAP = 5;
+
     public GameView(Context context) throws IOException {
         super(context);
 
@@ -40,12 +42,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         getHolder().addCallback(this);
         m_thread = new GameViewThread(getHolder(), this);
+        InputStream is = null;
+        List<int[]> tmp = null;
+        for(int i=0; i<MAX_MAP; ++i) {
+            is = getResources().getAssets().open("map_no"+i+".csv");
+            tmp = CSVReader.read(is);
+            AppManager.getInstance().addMap(tmp);
+        }
 
-        InputStream is = getResources().getAssets().open("map_no2.csv");
-        List<int[]> tmp = CSVReader.read(is);
-        AppManager.getInstance().addMap(tmp);
 
-        ChangeGameState(new GameState());
+
+        ChangeGameState(new GameState(), 2);
 
         m_stick = new VirtualJoystick();
         m_jump = new JumpButton();
@@ -116,27 +123,30 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             switch (action & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN: // 처음 터치가 눌러졌을 때
-                    if (event.getX() < AppManager.getInstance().getWidth() / 2) {
+                    if (event.getX() < AppManager.getInstance().getWidth() / 2-100) {
                         m_stick.enableJoystick((int) event.getX(), (int) event.getY());
-                    } else {
+                    } else if(event.getX() > AppManager.getInstance().getWidth() / 2+100){
                         m_jump.setPosition((int) event.getX(), (int) event.getY());
                         m_jump.setJump(true);
                     }
                     break;
                 case MotionEvent.ACTION_MOVE: // 터치가 눌린 상태에서 움직일 때
+                    m_jump.setJump(false);
                     for(int i=0; i<pointer_count; ++i) {
-                        if (event.getX(i) < AppManager.getInstance().getWidth() / 2) {
+                        if (event.getX(i) < AppManager.getInstance().getWidth() / 2-100) {
                             //move_x = m_stick.moveJoystick((int) event.getX(i), (int) event.getY(i));
                             m_stick.moveJoystick((int) event.getX(i), (int) event.getY(i));
-                        } else {
-                            m_jump.setJump(true);
+                        }
+                        else if (event.getX(i) > AppManager.getInstance().getWidth() / 2-100 &&
+                                event.getX(i) < AppManager.getInstance().getWidth() / 2+100){
+                            m_stick.disableJoystick();
                         }
                     }
                     break;
                 case MotionEvent.ACTION_UP: // 터치가 떼어졌을 때
-                    if (event.getX() < AppManager.getInstance().getWidth() / 2) {
+                    if (event.getX() < AppManager.getInstance().getWidth() / 2-100) {
                         m_stick.disableJoystick();
-                    } else {
+                    } else if(event.getX() > AppManager.getInstance().getWidth() / 2+100){
                         m_jump.setJump(false);
                     }
                     break;
@@ -145,9 +155,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     multi_x = event.getX(pointerIndex);
                     multi_y = event.getY(pointerIndex);
 
-                    if (multi_x < AppManager.getInstance().getWidth() / 2) {
+                    if (multi_x < AppManager.getInstance().getWidth() / 2-100) {
                         m_stick.enableJoystick((int) multi_x, (int) multi_y);
-                    } else {
+                    } else if(multi_x > AppManager.getInstance().getWidth() / 2+100){
                         m_jump.setPosition((int) multi_x, (int) multi_y);
                         m_jump.setJump(true);
                     }
@@ -156,9 +166,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
                     multi_x = event.getX(pointerIndex);
 
-                    if (multi_x < AppManager.getInstance().getWidth() / 2) {
+                    if (multi_x < AppManager.getInstance().getWidth() / 2-100) {
                         m_stick.disableJoystick();
-                    } else {
+                    } else if(multi_x > AppManager.getInstance().getWidth() / 2+100){
                         m_jump.setJump(false);
                     }
                     break;
@@ -174,11 +184,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
-    public void ChangeGameState(IState state) {
+    public void ChangeGameState(IState state, int index) {
         if(m_state != null)
             m_state.Destroy();
-
-        state.Init();
+        int x[], y[];
+        x = new int[6];
+        y = new int[6];
+        for(int i=0; i<6; ++i) {
+            x[i] = i*150;
+            y[i] = 0;
+        }
+        state.Init(x, y, index);
         m_state = state;
     }
 }
