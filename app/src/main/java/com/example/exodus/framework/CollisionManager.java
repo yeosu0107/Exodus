@@ -43,8 +43,8 @@ public class CollisionManager {
         }
 
         if(collChectBox.centerX() <= box1.m_ColliisionBox.centerX()) {
-            Log.d("distance" , String.valueOf(distance));
-            Log.d("length" , String.valueOf(Length(collChectBox.centerX(), box1.m_ColliisionBox.centerX())));
+            //Log.d("distance" , String.valueOf(distance));
+           // Log.d("length" , String.valueOf(Length(collChectBox.centerX(), box1.m_ColliisionBox.centerX())));
             if(distance < Length(collChectBox.centerX(), box1.m_ColliisionBox.centerX())) {
                 collside1 = SIDE_LEFT;
                 collside2 = SIDE_RIGHT;

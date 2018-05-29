@@ -2,6 +2,7 @@ package com.example.exodus.gamelogic;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.util.Log;
 
 import com.example.exodus.R;
@@ -144,5 +145,9 @@ public class Player{
     public void setDir(int dir) {
         m_dir = dir;
         m_ani[m_state + m_dir].setPosition(m_x, m_y);
+    }
+
+    Rect getCollisionBox() {
+        return m_collBox.m_ColliisionBox;
     }
 }

@@ -110,6 +110,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             final int action = event.getAction();
             final int pointer_count = event.getPointerCount();
             float multi_x, multi_y;
+            int pointerIndex = -1;
+
             switch (action & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN: // 처음 터치가 눌러졌을 때
                     if (event.getX() < AppManager.getInstance().getWidth() / 2) {
@@ -136,27 +138,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     }
                     break;
                 case MotionEvent.ACTION_POINTER_DOWN: // 터치가 두 개 이상일 때 눌러졌을 때
-                    for(int i=0; i<pointer_count; ++i) {
-                        multi_x = event.getX(i);
-                        multi_y = event.getY(i);
+                    pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                    multi_x = event.getX(pointerIndex);
+                    multi_y = event.getY(pointerIndex);
 
-                        if (multi_x < AppManager.getInstance().getWidth() / 2) {
-                            m_stick.enableJoystick((int) multi_x, (int) multi_y);
-                        } else {
-                            m_jump.setPosition((int) multi_x, (int) multi_y);
-                            m_jump.setJump(true);
-                        }
+                    if (multi_x < AppManager.getInstance().getWidth() / 2) {
+                        m_stick.enableJoystick((int) multi_x, (int) multi_y);
+                    } else {
+                        m_jump.setPosition((int) multi_x, (int) multi_y);
+                        m_jump.setJump(true);
                     }
                     break;
                 case MotionEvent.ACTION_POINTER_UP: // 터치가 두 개 이상일 때 떼어졌을 때
-                    for(int i=0; i<pointer_count; ++i) {
-                        multi_x = event.getX(i);
+                    pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                    multi_x = event.getX(pointerIndex);
 
-                        if (multi_x < AppManager.getInstance().getWidth() / 2) {
-                            m_stick.disableJoystick();
-                        } else {
-                            m_jump.setJump(false);
-                        }
+                    if (multi_x < AppManager.getInstance().getWidth() / 2) {
+                        m_stick.disableJoystick();
+                    } else {
+                        m_jump.setJump(false);
                     }
                     break;
                 default:

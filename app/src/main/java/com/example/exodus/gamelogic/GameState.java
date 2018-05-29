@@ -75,8 +75,10 @@ public class GameState implements IState{
         CollisionCheck();
 
         for(int i = 0; i < MAX_PLAYER; ++i) {
-            if(m_player[i].State() != Player.jumpup)
+            if(m_player[i].State() != Player.jumpup) {
+                if (m_player[i].State() == Player.unclick) continue;
                 m_player[i].move(0, 10);
+            }
         }
 
         EndCollside();
@@ -132,32 +134,33 @@ public class GameState implements IState{
 
     @Override
     public void MovePlayers(boolean isJump, int moveX) {
-        if(isJump) {
-            if(m_player[0].State() != Player.jumpdown) {
-                Log.d("IsJump", String.valueOf(m_player[0].State()));
-                m_player[0].setState(Player.jumpup);
+        for(Player cur : m_player) {
+            if (cur.State() == Player.unclick)
+                continue;
+            if (isJump) {
+                if (cur.State() != Player.jumpdown) {
+                    //Log.d("IsJump", String.valueOf(m_player[0].State()));
+                    cur.setState(Player.jumpup);
+                }
+            }
+            if (moveX == 0) {
+                if (cur.IsJump()) {
+                    cur.setState(Player.idle);
+                }
+            } else if (moveX > 0) {
+                cur.setDir(0);
+                if (cur.IsJump()) {
+                    cur.setState(Player.run);
+                }
+                cur.move(10, 0);
+            } else if (moveX < 0) {
+                cur.setDir(1);
+                if (cur.IsJump()) {
+                    cur.setState(Player.run);
+                }
+                cur.move(-10, 0);
             }
         }
-        if(moveX == 0) {
-            if(m_player[0].IsJump()) {
-                m_player[0].setState(Player.idle);
-            }
-        }
-        else if(moveX > 0) {
-            m_player[0].setDir(0);
-            if(m_player[0].IsJump()) {
-                m_player[0].setState(Player.run);
-            }
-            m_player[0].move(10, 0);
-        }
-        else if(moveX< 0) {
-            m_player[0].setDir(1);
-            if(m_player[0].IsJump()) {
-                m_player[0].setState(Player.run);
-            }
-            m_player[0].move(-10, 0);
-        }
-
     }
 
     @Override
@@ -194,6 +197,18 @@ public class GameState implements IState{
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return false;
+        boolean touched = false;
+        if(event.getAction() != MotionEvent.ACTION_DOWN) return false;
+        for(Player cur : m_player) {
+            Rect playerRect = cur.getCollisionBox();
+            if(playerRect.contains((int)event.getX(), (int)event.getY())) {
+                if (cur.State() != Player.unclick)
+                    cur.setState(Player.unclick);
+                else
+                    cur.setState(Player.idle);
+                touched = true;
+            }
+        }
+        return touched;
     }
 }
