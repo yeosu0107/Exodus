@@ -44,7 +44,7 @@ public class VirtualJoystick{
         onDraw = false;
     }
 
-    public int moveJoystick(int x, int y) {
+    public void moveJoystick(int x, int y) {
         int tx = x-move_size;
         int ty = y-move_size;
 
@@ -64,7 +64,7 @@ public class VirtualJoystick{
 
         moveStick.setPosition(tx, ty);
 
-        return x - now_x;
+        //return x - now_x;
     }
 
     public boolean isDraw() {return onDraw;}
@@ -72,5 +72,9 @@ public class VirtualJoystick{
     public void render(Canvas canvas) {
         backStick.draw(canvas);
         moveStick.draw(canvas);
+    }
+
+    public int distX() {
+        return moveStick.getX() - now_x;
     }
 }

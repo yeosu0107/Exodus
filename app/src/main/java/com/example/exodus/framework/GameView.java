@@ -27,6 +27,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private IState          m_state;
     private VirtualJoystick m_stick;
     private JumpButton      m_jump;
+    private int             move_x;
 
     public GameView(Context context) throws IOException {
         super(context);
@@ -62,6 +63,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     void Update() {
+        m_state.MovePlayers(m_jump.isJump(), move_x);
         m_state.Update();
     }
 
@@ -106,7 +108,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(!m_state.onTouchEvent(event)) { //state에서 터치이벤트가 없을 때만 발동
-            int move_x = 0;
+            move_x = 0;
             final int action = event.getAction();
             final int pointer_count = event.getPointerCount();
             float multi_x, multi_y;
@@ -124,7 +126,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 case MotionEvent.ACTION_MOVE: // 터치가 눌린 상태에서 움직일 때
                     for(int i=0; i<pointer_count; ++i) {
                         if (event.getX(i) < AppManager.getInstance().getWidth() / 2) {
-                            move_x = m_stick.moveJoystick((int) event.getX(i), (int) event.getY(i));
+                            //move_x = m_stick.moveJoystick((int) event.getX(i), (int) event.getY(i));
+                            m_stick.moveJoystick((int) event.getX(i), (int) event.getY(i));
                         } else {
                             m_jump.setJump(true);
                         }
@@ -159,11 +162,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         m_jump.setJump(false);
                     }
                     break;
+
                 default:
                     break;
             }
-
-            m_state.MovePlayers(m_jump.isJump(), move_x);
+            if(m_stick.isDraw()) {
+                move_x = m_stick.distX();
+            }
+            //m_state.MovePlayers(m_jump.isJump(), move_x);
         }
         return true;
     }
