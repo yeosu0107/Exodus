@@ -9,7 +9,7 @@ import android.view.MotionEvent;
  */
 
 public interface IState {
-    public void Init();
+    public void Init(int x[], int y[], int index);
     public void Destroy();
     public void Update();
     public void Render(Canvas canvas);

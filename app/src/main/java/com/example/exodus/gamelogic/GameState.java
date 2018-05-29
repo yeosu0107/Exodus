@@ -35,7 +35,7 @@ public class GameState implements IState{
     private EffectManagement m_Effect;
 
     @Override
-    public void Init() {
+    public void Init(int x[], int y[], int mapIndex) {
         m_player = new Player[MAX_PLAYER];
         for(int i=0; i<MAX_PLAYER; ++i) {
             m_player[i] = new Player();
@@ -52,7 +52,7 @@ public class GameState implements IState{
         m_Gem = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.gem),
                 10, 5, 1, BlockObject.FLAG_HOLDING);
         m_Gem.setting(100, 600);
-        m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(0));
+        m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(mapIndex));
         m_back = new BackGround(AppManager.getInstance().getBitmap(R.drawable.back));
         m_Effect = new EffectManagement();
         m_Effect.BuildObjects();
@@ -218,15 +218,17 @@ public class GameState implements IState{
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean touched = false;
-        if(event.getAction() != MotionEvent.ACTION_DOWN) return false;
+        //if(event.getAction() != MotionEvent.ACTION_DOWN) return false;
         for(Player cur : m_player) {
             Rect playerRect = cur.CollisionBox();
             if(playerRect.contains((int)event.getX(), (int)event.getY())) {
+                touched = true;
+                if(event.getAction() != MotionEvent.ACTION_DOWN) continue;
                 if (cur.State() != Player.unclick)
                     cur.setState(Player.unclick);
                 else
                     cur.setState(Player.idle);
-                touched = true;
+                //touched = true;
             }
         }
         return touched;
