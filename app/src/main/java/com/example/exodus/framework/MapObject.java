@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.Log;
 
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,11 @@ public class MapObject extends GraphicObject{
     private List<int[]> m_tiles;
 
     public List<CollisionBox> m_Collboxs;
+
+    private List<Integer> m_startPoint;
+    private List<Integer> m_boxPoint;
+    private int[] m_keyPoint;
+    private int[] m_doorPoint;
 
     public MapObject(Bitmap bitmap, int nWidth, int nHeight, List<int[]> tiles) {
         super(bitmap);
@@ -46,6 +52,10 @@ public class MapObject extends GraphicObject{
         int sliceX = AppManager.getInstance().getTileWidth();
         int sliceY = AppManager.getInstance().getTileHeight();
 
+        m_startPoint = new ArrayList<Integer>();
+        m_boxPoint = new ArrayList<Integer>();
+        m_keyPoint = new int[2];
+        m_doorPoint = new int[2];
         Rect collrect = new Rect(-1, -1, -1, -1);
         Rect dest = new Rect();
 
@@ -53,10 +63,27 @@ public class MapObject extends GraphicObject{
             int[] line = m_tiles.get(i);
             //sliceX = AppManager.getInstance().getWidth() / (line.length - 1);
             for(int j=0; j<line.length; ++j) {
-                if(line[j] == -1) {
+                if(line[j] < 0) {
                     if(collrect.left != -1) {
                         AddCollisionBox(collrect);;
                         collrect.set(-1, -1, -1, -1);
+                    }
+
+                    if(line[j] == -10) {
+                        m_startPoint.add(j*sliceX);
+                        m_startPoint.add(i*sliceY);
+                    }
+                    else if(line[j] == -20) {
+                        m_boxPoint.add(j*sliceX);
+                        m_boxPoint.add(i*sliceY);
+                    }
+                    else if(line[j] == -30) {
+                        m_doorPoint[0] = j*sliceX;
+                        m_doorPoint[1] = i*sliceY;
+                    }
+                    else if(line[j]==-40) {
+                        m_keyPoint[0] = j*sliceX;
+                        m_keyPoint[1] = i*sliceY;
                     }
                     continue;
                 }
@@ -117,4 +144,9 @@ public class MapObject extends GraphicObject{
         if(!IsUnion)
             m_Collboxs.add(new CollisionBox(rect, 1));
     }
+
+    public List<Integer> getStartPoint() {return m_startPoint; }
+    public int[] getKeyPoint() {return m_keyPoint; }
+    public int[] get_doorPoint() {return m_doorPoint;}
+    public List<Integer> getBoxPoint() {return m_boxPoint; }
 }

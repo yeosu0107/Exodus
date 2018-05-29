@@ -16,6 +16,8 @@ import com.example.exodus.framework.EffectManagement;
 import com.example.exodus.framework.IState;
 import com.example.exodus.framework.MapObject;
 
+import java.util.List;
+
 /**
  * Created by 여성우 on 2018-05-17.
  */
@@ -36,23 +38,29 @@ public class GameState implements IState{
 
     @Override
     public void Init(int x[], int y[], int mapIndex) {
+        m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(mapIndex));
+        List<Integer> startPoint = m_map.getStartPoint();
+        List<Integer> boxPoint = m_map.getBoxPoint();
+        int[] doorPoint = m_map.get_doorPoint();
+        int[] keyPoint = m_map.getKeyPoint();
+
         m_player = new Player[MAX_PLAYER];
         for(int i=0; i<MAX_PLAYER; ++i) {
             m_player[i] = new Player();
-            m_player[i].setting(i*150, 0);
+            m_player[i].setting(startPoint.get(i*2), startPoint.get(i*2 + 1));
         }
-        m_player[0].setState(Player.idle);
+
         m_testblock = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.crate), 1, 1, 2, 0);
-        m_testblock.setting(150,300);
+        m_testblock.setting(boxPoint.get(0),boxPoint.get(1));
 
         m_Door = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.door), 1, 2, 2,
                 BlockObject.FLAG_HOLDING | BlockObject.FLAG_NO_CHANGE_SPRITE);
-        m_Door.settingBoxsize(54,18);
-
+        //m_Door.settingBoxsize(54,18);
+        m_Door.setting(doorPoint[0],doorPoint[1]);
         m_Gem = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.gem),
                 10, 5, 1, BlockObject.FLAG_HOLDING);
-        m_Gem.setting(100, 600);
-        m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(mapIndex));
+        m_Gem.setting(keyPoint[0], keyPoint[1]);
+
         m_back = new BackGround(AppManager.getInstance().getBitmap(R.drawable.back));
         m_Effect = new EffectManagement();
         m_Effect.BuildObjects();
