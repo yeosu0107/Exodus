@@ -59,7 +59,7 @@ public class Player{
         m_state = unclick;
         m_dir = 0;
         m_jumpHeight = 0;
-        m_collBox = new CollisionBox(new Rect(0, 0, 32, 32), 2);
+        m_collBox = new CollisionBox(new Rect(0, 0, AppManager.getInstance().getTileWidth(), AppManager.getInstance().getTileHeight()), 2);
     }
 
     public void setting(int x, int y) {

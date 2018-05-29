@@ -24,6 +24,9 @@ public class SpriteObject extends GraphicObject{
     protected boolean m_bLoop = true;
     protected boolean m_bEnd = false;
 
+    private int m_destWidth;
+    private int m_destHeight;
+
     public SpriteObject(Bitmap bitmap) {
         super(bitmap);
 
@@ -54,6 +57,9 @@ public class SpriteObject extends GraphicObject{
         m_fps = 1000 / theFPS;
         m_nFrame = nFrame;
         m_time = time;
+
+        m_destWidth = AppManager.getInstance().getTileWidth();
+        m_destHeight = AppManager.getInstance().getTileHeight();
     }
 
     public void update(long time) {

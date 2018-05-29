@@ -75,4 +75,7 @@ public class AppManager {
 
     public int getWidth() {return screen_width;}
     public int getHeight() {return screen_height;}
+
+    public int getTileWidth() {return screen_width / (m_mapList.get(0).get(0).length - 1);}
+    public int getTileHeight() {return screen_height / m_mapList.get(0).size();}
 }

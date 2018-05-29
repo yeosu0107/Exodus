@@ -43,15 +43,15 @@ public class MapObject extends GraphicObject{
     public void MakeResource(Canvas canvas) {
         Rect m_rectangle = new Rect(0,0,0,0);
 
-        int sliceX = 0;
-        int sliceY = AppManager.getInstance().getHeight() / m_tiles.size();
+        int sliceX = AppManager.getInstance().getTileWidth();
+        int sliceY = AppManager.getInstance().getTileHeight();
 
         Rect collrect = new Rect(-1, -1, -1, -1);
         Rect dest = new Rect();
 
         for(int i=0; i<m_tiles.size(); ++i) {
             int[] line = m_tiles.get(i);
-            sliceX = AppManager.getInstance().getWidth() / (line.length - 1);
+            //sliceX = AppManager.getInstance().getWidth() / (line.length - 1);
             for(int j=0; j<line.length; ++j) {
                 if(line[j] == -1) {
                     if(collrect.left != -1) {
