@@ -10,6 +10,7 @@ import com.example.exodus.framework.CollisionBox;
 import com.example.exodus.framework.CollisionManager;
 import com.example.exodus.framework.GraphicObject;
 import com.example.exodus.framework.SpriteObject;
+import com.example.exodus.gamelogic.Player;
 
 /**
  * Created by MSI on 2018-05-23.
@@ -22,10 +23,15 @@ public class BlockObject {
     static public final int FLAG_NO_COLLISION_BOX = 4;
 
     public CollisionBox m_collBox;
+    public Player m_player = null;
+
     private boolean m_drawable = true;
+
     private int m_Flags = 0;
     private int m_x, m_y;
+
     private SpriteObject m_Texture;
+
 
     public BlockObject(Bitmap bitmap, int FPS, int nFrame, int time, int flag) {
         this.setPosition(0,0);
@@ -45,6 +51,15 @@ public class BlockObject {
         m_Texture.setPosition(x, y);
     }
 
+    public void settingBoxsize(float x, float y) {
+        Point p = new Point((int)(x *AppManager.getInstance().getTileWidth()),
+                (int)(y * AppManager.getInstance().getTileHeight()));
+
+        this.setPosition(p.x, p.y);
+        m_collBox.SetPosition(p.x, p.y);
+        m_Texture.setPosition(p.x, p.y);
+    }
+
     public void draw(Canvas canvas) {
         if(!m_drawable) return;
         m_collBox.DrawCollisionBox(canvas);
@@ -53,15 +68,25 @@ public class BlockObject {
     }
 
     public void update(long time) {
+        if(!m_drawable) return;
         if((m_Flags & FLAG_NO_CHANGE_SPRITE) == 0)
             m_Texture.update(time);
 
-        if((m_Flags & FLAG_HOLDING) > 0)
-            return;
+        if((m_Flags & FLAG_HOLDING) > 0) {
+            if(m_player != null) {
+                Point playerpos = m_player.GetPosition();
+                int offsetScale = m_player.GetScale() - m_Texture.GetScale();
+                Point newpos = new Point(playerpos.x + offsetScale * m_Texture.GetDest().x / 2,
+                        playerpos.y + offsetScale * m_Texture.GetDest().y / 2);
 
+                m_Texture.setPosition(newpos);
+                m_collBox.SetPosition(newpos);
+            }
+            return;
+        }
         // 오른쪽 충돌이 일어난 경우 왼쪽으로 밈
-        if(!m_collBox.IsEnableMove(CollisionManager.SIDE_RIGHT)) move(-5,0);
-        if(!m_collBox.IsEnableMove(CollisionManager.SIDE_LEFT)) move(10, 0);
+        if(!m_collBox.IsEnableMove(CollisionManager.SIDE_RIGHT)) move(-15,0);
+        if(!m_collBox.IsEnableMove(CollisionManager.SIDE_LEFT)) move(15, 0);
         if(m_collBox.IsEnableMove(CollisionManager.SIDE_BOTTOM)) move(0, 5) ;
     }
 
@@ -77,19 +102,20 @@ public class BlockObject {
     }
 
     public void SetSpriteFrame(int frame) { m_Texture.SetSpriteFrame(frame); }
-
+    public void SetPlayer(Player player) { m_player = player; }
     public boolean getDrawalbe() { return m_drawable; }
 
     public void move(int x, int y) {
+        if(!m_drawable) return;
         if(x > 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_RIGHT)) x = 0;
         else if(x < 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_LEFT)) x = 0;
         if( y > 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_BOTTOM)) y = 0 ;
         else if( y < 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_TOP)) y = 0;
 
-        m_x += x;
-        m_y += y;
+        m_collBox.Move(x, y);
+        m_x = m_collBox.GetPosition().x;
+        m_y = m_collBox.GetPosition().y;
 
-        m_collBox.Move(x,y);
         m_Texture.setPosition(m_x, m_y);
     }
 

@@ -2,6 +2,7 @@ package com.example.exodus.framework;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -47,6 +48,8 @@ public class SpriteObject extends GraphicObject{
         m_time = other.m_time;
         m_bLoop = other.m_bLoop;
         m_bEnd = other.m_bEnd;
+        m_destWidth = other.m_destWidth;
+        m_destHeight = other.m_destHeight;
     }
 
     public void initSpriteData(int theFPS, int nFrame, int time) { //fps, 프레임갯수, 확대배율
@@ -86,11 +89,13 @@ public class SpriteObject extends GraphicObject{
         canvas.drawBitmap(m_bit, m_rectangle, dest, null);
     }
 
-    public int NowFrame() { return m_nFrame; }
+    public int NowFrame() { return m_currFrame; }
 
     public void SetSpriteFrame(int frame) { m_currFrame = frame; }
     public void Start() { m_bLoop = true; }
     public void SetLoop(boolean loop) { m_bLoop = loop;}
+    public Point GetDest() { return new Point(m_destWidth, m_destHeight); }
     public boolean IsEnd() { return m_bEnd; }
+    public int GetScale() { return m_time; }
 
 }

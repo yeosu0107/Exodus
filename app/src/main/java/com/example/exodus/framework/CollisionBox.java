@@ -8,12 +8,15 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.ViewDebug;
 
+import com.example.exodus.gamelogic.Player;
+
 /**
  * Created by MSI on 2018-05-22.
  */
 
 public class CollisionBox {
     public Rect m_ColliisionBox;
+
     public Point m_Size;
     public Paint m_Paint;
 
@@ -43,14 +46,16 @@ public class CollisionBox {
         // offsetTo 함수를 통해 충돌박스 위치를 Left, Top위치로 이동
         m_ColliisionBox.offsetTo(x , y );
     }
+    public void SetPosition(Point p) {
+        // offsetTo 함수를 통해 충돌박스 위치를 Left, Top위치로 이동
+        m_ColliisionBox.offsetTo(p.x , p.y);
+    }
 
     public Point GetPosition() {
         return new Point(m_ColliisionBox.left, m_ColliisionBox.top);
     }
 
-    public void DrawCollisionBox(Canvas canvas) {
-        canvas.drawRect(m_ColliisionBox, m_Paint);
-    }
+    public void DrawCollisionBox(Canvas canvas) { /*canvas.drawRect(m_ColliisionBox, m_Paint);*/ }
 
     public void Move(int x, int y) {
         m_ColliisionBox.offset(x, y);

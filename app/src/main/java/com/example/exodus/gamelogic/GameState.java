@@ -47,10 +47,10 @@ public class GameState implements IState{
 
         m_Door = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.door), 1, 2, 2,
                 BlockObject.FLAG_HOLDING | BlockObject.FLAG_NO_CHANGE_SPRITE);
-        m_Door.setting(400,600);
+        m_Door.settingBoxsize(54,18);
 
         m_Gem = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.gem),
-                10, 5, 2, BlockObject.FLAG_HOLDING);
+                10, 5, 1, BlockObject.FLAG_HOLDING);
         m_Gem.setting(100, 600);
         m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(0));
         m_back = new BackGround(AppManager.getInstance().getBitmap(R.drawable.back));
@@ -82,37 +82,47 @@ public class GameState implements IState{
         }
 
         EndCollside();
+
+
         if(m_NumofGem == 0)
             m_Door.SetSpriteFrame(1);
-
         m_testblock.update(time);
         m_Gem.update(time);
         m_Effect.Update(time);
     }
+
     public void CollisionCheck() {
         for(int i = 0; i < MAX_PLAYER; ++i) {
-            if(m_Door.NowFrame() == 2) {
-                if(Rect.intersects(m_player[i].CollisionBox(), m_Door.CollisionBox())) {
+
+            //  플레이어 - 문 충돌
+            if (m_Door.NowFrame() == 1) {
+                if (!m_player[i].GetClear() && Rect.intersects(m_player[i].CollisionBox(), m_Door.CollisionBox())) {
+                    m_Effect.StartStarEffect(m_player[i].GetPosition());
                     m_player[i].SetClear(true);
                 }
-
             }
 
+            // 플레이어 - 맵 충돌
             m_map.CollisionCheck(m_player[i].m_collBox);
             for (int j = i + 1; j < MAX_PLAYER; ++j)
                 CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, false);
 
             CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_testblock.m_collBox, true);
-
-            if(m_Gem.getDrawalbe()) {
-                if(Rect.intersects(m_player[i].CollisionBox(), m_Gem.CollisionBox())) {
-                    m_Gem.setDrawable(false);
-                    m_Effect.StartStarEffect(m_Gem.GetPosition());
-                    m_NumofGem--;
+            if (m_Gem.m_player == null && m_Gem.getDrawalbe()) {
+                if (Rect.intersects(m_player[i].CollisionBox(), m_Gem.CollisionBox())) {
+                    m_Gem.SetPlayer(m_player[i]);
                 }
-
             }
         }
+
+        if(m_Gem.getDrawalbe()) {
+            if(Rect.intersects(m_Door.CollisionBox(), m_Gem.CollisionBox())) {
+                m_Gem.setDrawable(false);
+                m_NumofGem--;
+            }
+
+        }
+
         m_map.CollisionCheck(m_testblock.m_collBox);
     }
     public void EndCollside() {

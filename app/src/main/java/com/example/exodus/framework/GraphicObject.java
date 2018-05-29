@@ -2,6 +2,7 @@ package com.example.exodus.framework;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 
 /**
@@ -26,6 +27,11 @@ public class GraphicObject {
     public void setPosition(int x, int y) {
         m_x=x;
         m_y=y;
+    }
+
+    public void setPosition(Point p) {
+        m_x=p.x;
+        m_y=p.y;
     }
 
     public int getX() {return m_x; }

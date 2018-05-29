@@ -2,6 +2,7 @@ package com.example.exodus.gamelogic;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -59,7 +60,7 @@ public class Player{
         m_state = unclick;
         m_dir = 0;
         m_jumpHeight = 0;
-        MAX_JUMP_HEIGHT = AppManager.getInstance().getTileHeight() * -4;
+        MAX_JUMP_HEIGHT = AppManager.getInstance().getTileHeight() * -3;
         m_collBox = new CollisionBox(new Rect(0, 0, AppManager.getInstance().getTileWidth(), AppManager.getInstance().getTileHeight()), 2);
     }
 
@@ -132,10 +133,17 @@ public class Player{
 
     }
 
+    public Point GetPosition() {
+        return new Point(m_collBox.GetPosition().x,  m_collBox.GetPosition().y);
+    }
+
     public void SetClear(boolean isclear) {
         m_state = unclick;
         m_clear = isclear;
         m_collBox.m_DisableCollCheck = true;
+    }
+    public boolean GetClear() {
+        return m_clear;
     }
 
     public int State() { return m_state;}
@@ -164,5 +172,6 @@ public class Player{
             m_ani[m_state].setPosition(m_x, m_y);
     }
 
-    public Rect CollisionBox() {return m_collBox.m_ColliisionBox;}
+    public Rect CollisionBox() { return m_collBox.m_ColliisionBox; }
+    public int GetScale() { return m_ani[0].GetScale(); }
 }

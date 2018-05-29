@@ -27,7 +27,8 @@ public class EffectManagement {
     public void BuildObjects() {
         m_pEffects = new SpriteObject[NUM_EFFECT];
         m_pEffects[0] = new SpriteObject(AppManager.getInstance().getBitmap(R.drawable.star));
-        m_pEffects[0].initSpriteData( 25, 4, 2);
+        m_pEffects[0].initSpriteData( 25, 4, 3);
+
         for(int i = 0 ; i < NUM_EFFECT; ++i) {
             m_pEffects[i].m_bLoop = false;
             m_pEffects[i].m_bEnd = false;
