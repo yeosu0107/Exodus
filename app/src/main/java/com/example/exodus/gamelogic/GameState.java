@@ -37,7 +37,7 @@ public class GameState implements IState{
     private EffectManagement m_Effect;
 
     @Override
-    public void Init(int x[], int y[], int mapIndex) {
+    public void Init(int mapIndex) {
         m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(mapIndex));
         List<Integer> startPoint = m_map.getStartPoint();
         List<Integer> boxPoint = m_map.getBoxPoint();
@@ -214,6 +214,10 @@ public class GameState implements IState{
                 m_player[0].setState(Player.run);
             m_player[0].move(10, 0);
         }
+
+        if(keyCode == event.KEYCODE_0) {
+            resetMap();
+        }
         return true;
     }
 
@@ -239,6 +243,26 @@ public class GameState implements IState{
                 //touched = true;
             }
         }
+        if(event.getX() > AppManager.getInstance().getWidth() - 50 && event.getY() > AppManager.getInstance().getHeight() - 50)
+            resetMap();
         return touched;
+    }
+
+    public void resetMap() {
+        List<Integer> startPoint = m_map.getStartPoint();
+        List<Integer> boxPoint = m_map.getBoxPoint();
+        int[] doorPoint = m_map.get_doorPoint();
+        int[] keyPoint = m_map.getKeyPoint();
+
+        for(int i=0; i<MAX_PLAYER; ++i) {
+            m_player[i].setting(startPoint.get(i*2), startPoint.get(i*2 + 1));
+            m_player[i].SetClear(false);
+        }
+
+        m_testblock.setting(boxPoint.get(0),boxPoint.get(1));
+
+        m_Door.setting(doorPoint[0],doorPoint[1]);
+
+        m_Gem.setting(keyPoint[0], keyPoint[1]);
     }
 }

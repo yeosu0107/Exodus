@@ -29,6 +29,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private JumpButton      m_jump;
     private int             move_x;
 
+    private int m_stage = 0;
+
     final int MAX_MAP = 5;
 
     public GameView(Context context) throws IOException {
@@ -51,8 +53,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
 
-
-        ChangeGameState(new GameState(), 2);
+        m_stage = 0;
+        ChangeGameState(new GameState(), m_stage);
 
         m_stick = new VirtualJoystick();
         m_jump = new JumpButton();
@@ -179,6 +181,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if(m_stick.isDraw()) {
                 move_x = m_stick.distX();
             }
+            if(event.getX() > AppManager.getInstance().getWidth() - 50 && event.getY() < 50) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    m_stage += 1;
+                    if (m_stage >= MAX_MAP)
+                        m_stage = 0;
+                    ChangeGameState(new GameState(), m_stage);
+                }
+            }
             //m_state.MovePlayers(m_jump.isJump(), move_x);
         }
         return true;
@@ -187,14 +197,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void ChangeGameState(IState state, int index) {
         if(m_state != null)
             m_state.Destroy();
-        int x[], y[];
-        x = new int[6];
-        y = new int[6];
-        for(int i=0; i<6; ++i) {
-            x[i] = i*150;
-            y[i] = 0;
-        }
-        state.Init(x, y, index);
+
+        state.Init(index);
         m_state = state;
     }
 }

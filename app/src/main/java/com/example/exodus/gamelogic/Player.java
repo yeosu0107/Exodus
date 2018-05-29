@@ -140,7 +140,7 @@ public class Player{
     public void SetClear(boolean isclear) {
         m_state = unclick;
         m_clear = isclear;
-        m_collBox.m_DisableCollCheck = true;
+        m_collBox.m_DisableCollCheck = isclear;
     }
     public boolean GetClear() {
         return m_clear;
