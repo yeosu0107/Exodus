@@ -116,7 +116,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(!m_state.onTouchEvent(event)) { //state에서 터치이벤트가 없을 때만 발동
+        int gameEvent = m_state.onTouchEvent(event);
+        if(gameEvent == GameState.NON_EVENT) { //state에서 터치이벤트가 없을 때만 발동
             move_x = 0;
             final int action = event.getAction();
             final int pointer_count = event.getPointerCount();
@@ -181,15 +182,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if(m_stick.isDraw()) {
                 move_x = m_stick.distX();
             }
-            if(event.getX() > AppManager.getInstance().getWidth() - 50 && event.getY() < 50) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                    m_stage += 1;
-                    if (m_stage >= MAX_MAP)
-                        m_stage = 0;
-                    ChangeGameState(new GameState(), m_stage);
-                }
-            }
             //m_state.MovePlayers(m_jump.isJump(), move_x);
+        }
+        else {
+            m_stick.disableJoystick();
+            m_jump.setJump(false);
+            if(gameEvent == GameState.NEXT_EVENT) {
+                m_stage += 1;
+                if (m_stage >= MAX_MAP)
+                    m_stage = 0;
+                ChangeGameState(new GameState(), m_stage);
+            }
+
         }
         return true;
     }

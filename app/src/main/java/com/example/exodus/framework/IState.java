@@ -18,6 +18,6 @@ public interface IState {
 
     public boolean onKeyDown(int keyCode, KeyEvent event);
     public boolean onKeyUp(int keyCode, KeyEvent event);
-    public boolean onTouchEvent(MotionEvent event);
+    public int onTouchEvent(MotionEvent event);
 
 }

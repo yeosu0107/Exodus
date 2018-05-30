@@ -4,7 +4,7 @@ import com.example.exodus.framework.CollisionBox;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.util.Log;
+import android.provider.Contacts;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -15,6 +15,7 @@ import com.example.exodus.framework.CollisionManager;
 import com.example.exodus.framework.EffectManagement;
 import com.example.exodus.framework.IState;
 import com.example.exodus.framework.MapObject;
+import com.example.exodus.gamelogic.UIManager;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class GameState implements IState{
 
     final int MAX_PLAYER = 6;
 
+    private int m_nNowPlayers;
     private int m_NumofGem = 1;
     private Player[] m_player;
     private BlockObject m_testblock;
@@ -35,6 +37,22 @@ public class GameState implements IState{
     private MapObject m_map;
     private BackGround m_back;
     private EffectManagement m_Effect;
+
+    private  UIManager m_ui;
+
+    static public final int GAME_RUNNING = 0;
+    static public final int GAME_PAUSE = 1;
+    static public final int GAME_CLEAR = 2;
+
+    static public final int NON_EVENT = 0;
+    static public final int BLANK_EVENT = 1;
+    static public final int NEXT_EVENT = 2;
+    static public final int HOME_EVENT = 3;
+    static public final int EXIT_EVENT = 4;
+
+
+
+    private int m_state;
 
     @Override
     public void Init(int mapIndex) {
@@ -64,6 +82,11 @@ public class GameState implements IState{
         m_back = new BackGround(AppManager.getInstance().getBitmap(R.drawable.back));
         m_Effect = new EffectManagement();
         m_Effect.BuildObjects();
+
+        m_state = GAME_RUNNING;
+        m_ui = new UIManager();
+
+        m_nNowPlayers = 6;
     }
 
     @Override
@@ -73,6 +96,9 @@ public class GameState implements IState{
 
     @Override
     public void Update() {
+        if(m_state == GAME_PAUSE)
+            return;
+
         long time = System.currentTimeMillis();
         for(Player cur : m_player) {
             cur.update(time);
@@ -94,6 +120,10 @@ public class GameState implements IState{
 
         if(m_NumofGem == 0)
             m_Door.SetSpriteFrame(1);
+
+        if(m_nNowPlayers <= 0)
+            m_state = GAME_CLEAR;
+
         m_testblock.update(time);
         m_Gem.update(time);
         m_Effect.Update(time);
@@ -107,6 +137,7 @@ public class GameState implements IState{
                 if (!m_player[i].GetClear() && Rect.intersects(m_player[i].CollisionBox(), m_Door.CollisionBox())) {
                     m_Effect.StartStarEffect(m_player[i].GetPosition());
                     m_player[i].SetClear(true);
+                    m_nNowPlayers -= 1;
                 }
             }
 
@@ -158,6 +189,8 @@ public class GameState implements IState{
         m_Gem.draw(canvas);
         m_Door.draw(canvas);
         m_Effect.draw(canvas);
+
+        m_ui.render(m_state, canvas);
     }
 
     @Override
@@ -228,23 +261,55 @@ public class GameState implements IState{
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        boolean touched = false;
+    public int onTouchEvent(MotionEvent event) {
+        int touched = NON_EVENT;
         //if(event.getAction() != MotionEvent.ACTION_DOWN) return false;
-        for(Player cur : m_player) {
-            Rect playerRect = cur.CollisionBox();
-            if(playerRect.contains((int)event.getX(), (int)event.getY())) {
-                touched = true;
-                if(event.getAction() != MotionEvent.ACTION_DOWN) continue;
-                if (cur.State() != Player.unclick)
-                    cur.setState(Player.unclick);
-                else
-                    cur.setState(Player.idle);
-                //touched = true;
+        int uiEvent = m_ui.touchEvent(m_state, (int)event.getX(), (int)event.getY());
+
+        if(uiEvent == -1) {
+            for (Player cur : m_player) {
+                Rect playerRect = cur.CollisionBox();
+                if (playerRect.contains((int) event.getX(), (int) event.getY())) {
+                    touched = BLANK_EVENT;
+                    if (event.getAction() != MotionEvent.ACTION_DOWN) continue;
+                    if (cur.State() != Player.unclick)
+                        cur.setState(Player.unclick);
+                    else
+                        cur.setState(Player.idle);
+                    //touched = true;
+                }
             }
         }
-        if(event.getX() > AppManager.getInstance().getWidth() - 50 && event.getY() > AppManager.getInstance().getHeight() - 50)
-            resetMap();
+        else {
+            touched = BLANK_EVENT;
+            if(event.getAction() != MotionEvent.ACTION_DOWN)
+                return touched;
+            switch (m_state) {
+                case GAME_RUNNING:
+                    m_state = GAME_PAUSE;
+                    break;
+                case GAME_PAUSE:
+                    if(uiEvent == 0)
+                        resetMap();
+                    else if(uiEvent == 1) {
+                        touched = EXIT_EVENT;
+                    }
+                    else if(uiEvent == -10)
+                        m_state = GAME_RUNNING;
+                    break;
+                case GAME_CLEAR:
+                    if(uiEvent == 0) {
+
+                    }
+                    else if(uiEvent == 1) {
+                        touched = NEXT_EVENT;
+                    }
+                    else if(uiEvent == 2) {
+
+                    }
+                    break;
+            }
+        }
         return touched;
     }
 
@@ -262,7 +327,15 @@ public class GameState implements IState{
         m_testblock.setting(boxPoint.get(0),boxPoint.get(1));
 
         m_Door.setting(doorPoint[0],doorPoint[1]);
+        m_Door.setDrawable(true);
+        m_Door.SetSpriteFrame(0);
 
         m_Gem.setting(keyPoint[0], keyPoint[1]);
+        m_Gem.setDrawable(true);
+
+        m_NumofGem = 1;
+        m_nNowPlayers = 6;
+
+        m_state = GAME_RUNNING;
     }
 }
