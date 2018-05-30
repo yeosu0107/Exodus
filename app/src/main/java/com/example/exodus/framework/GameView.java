@@ -29,9 +29,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private JumpButton      m_jump;
     private int             move_x;
 
+    private int m_nowScene;
     private int m_stage = 0;
 
     final int MAX_MAP = 10;
+    final int MAIN_SCENE = 0;
+    final int GAME_SCENE = 1;
 
     public GameView(Context context) throws IOException {
         super(context);
@@ -54,7 +57,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
         m_stage = 0;
-        ChangeGameState(new GameState(), m_stage);
+        ChangeGameState(new MainState(), m_stage);
 
         m_stick = new VirtualJoystick();
         m_jump = new JumpButton();
@@ -117,6 +120,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int gameEvent = m_state.onTouchEvent(event);
+
+        if(m_nowScene == MAIN_SCENE && gameEvent > 0) {
+            m_nowScene = GAME_SCENE;
+            m_stage = gameEvent - 1;
+            Log.d("tag", String.valueOf(gameEvent - 1));
+            ChangeGameState(new GameState(), gameEvent - 1);
+            return true;
+        }
+
         if(gameEvent == GameState.NON_EVENT) { //state에서 터치이벤트가 없을 때만 발동
             move_x = 0;
             final int action = event.getAction();
@@ -187,6 +199,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         else {
             m_stick.disableJoystick();
             m_jump.setJump(false);
+            if(gameEvent == GameState.EXIT_EVENT) {
+                m_nowScene = MAIN_SCENE;
+                ChangeGameState(new MainState(), MainState.SELECT_SCREEN);
+            }
             if(gameEvent == GameState.NEXT_EVENT) {
                 m_stage += 1;
                 if (m_stage > MAX_MAP - 1)

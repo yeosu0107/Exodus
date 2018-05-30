@@ -94,6 +94,21 @@ public class SpriteObject extends GraphicObject{
     public void SetSpriteFrame(int frame) { m_currFrame = frame; }
     public void Start() { m_bLoop = true; }
     public void SetLoop(boolean loop) { m_bLoop = loop;}
+
+    public void SetDestTileSize(int x, int y) {
+        m_destWidth  = x * AppManager.getInstance().getTileWidth();
+        m_destHeight = y * AppManager.getInstance().getTileHeight();
+    }
+
+    public void SetDest(Point p) {
+        m_destWidth  = p.x;
+        m_destHeight = p.y;
+    }
+
+    public void SetFrame(int frame) {
+        m_currFrame = frame;
+    }
+
     public Point GetDest() { return new Point(m_destWidth, m_destHeight); }
     public boolean IsEnd() { return m_bEnd; }
     public int GetScale() { return m_time; }
