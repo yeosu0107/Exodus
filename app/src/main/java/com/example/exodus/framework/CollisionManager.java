@@ -58,6 +58,7 @@ public class CollisionManager {
         AfterCollision(box1, collChectBox,collside1);
 
         if(!isMap) {
+            AfterCollision(box2, collChectBox,collside2);
         }
 
         box1.m_Collside |= collside1;
