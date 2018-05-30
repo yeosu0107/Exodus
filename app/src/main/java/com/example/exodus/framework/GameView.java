@@ -31,7 +31,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private int m_stage = 0;
 
-    final int MAX_MAP = 5;
+    final int MAX_MAP = 10;
 
     public GameView(Context context) throws IOException {
         super(context);
@@ -189,7 +189,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             m_jump.setJump(false);
             if(gameEvent == GameState.NEXT_EVENT) {
                 m_stage += 1;
-                if (m_stage >= MAX_MAP)
+                if (m_stage > MAX_MAP - 1)
                     m_stage = 0;
                 ChangeGameState(new GameState(), m_stage);
             }

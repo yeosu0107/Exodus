@@ -279,6 +279,10 @@ public class GameState implements IState{
                     //touched = true;
                 }
             }
+
+            if(event.getX() > AppManager.getInstance().getWidth() - 100 && event.getY() > AppManager.getInstance().getHeight() - 100 &&
+                    event.getAction() == MotionEvent.ACTION_DOWN)
+                touched = NEXT_EVENT;
         }
         else {
             touched = BLANK_EVENT;

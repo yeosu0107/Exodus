@@ -60,7 +60,7 @@ public class UIManager {
                 break;
 
         }
-        Log.e("buttonIndex", ""+buttonIndex);
+        //Log.e("buttonIndex", ""+buttonIndex);
         //Log.e("pos", x + "   " + y + "  " + x/AppManager.getInstance().getTileWidth() + "  " + y/AppManager.getInstance().getTileHeight());
         return buttonIndex;
     }
