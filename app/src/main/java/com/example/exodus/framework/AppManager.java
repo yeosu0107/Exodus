@@ -20,12 +20,15 @@ public class AppManager {
     private Resources m_resource;
 
     private List<List<int[]>> m_mapList;
+    private boolean[] m_ClearStage;
 
     private int screen_width;
     private int screen_height;
     //private GameState m_gamestate;
 
     public AppManager() {
+        m_ClearStage = new boolean[10];
+        for(boolean b : m_ClearStage) b = false;
         m_mapList=new ArrayList<List<int[]>>();
     }
 
@@ -53,6 +56,8 @@ public class AppManager {
         screen_height = y;
     }
 
+    public boolean[] getStageClearinfo() { return m_ClearStage; }
+    public void setStageClearInfo(int index, boolean info) { m_ClearStage[index] = info; }
     //public void setGameState(GameState state) {m_gamestate=state;}
 
     public  GameView getGameview() {

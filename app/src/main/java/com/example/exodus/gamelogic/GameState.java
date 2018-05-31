@@ -17,6 +17,7 @@ import com.example.exodus.framework.IState;
 import com.example.exodus.framework.MapObject;
 import com.example.exodus.gamelogic.UIManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class GameState implements IState{
     private int m_nNowPlayers;
     private int m_NumofGem = 1;
     private Player[] m_player;
-    private BlockObject m_testblock;
+    private List<BlockObject> m_blocks;
     private BlockObject m_Gem;
     private BlockObject m_Door;
 
@@ -56,6 +57,7 @@ public class GameState implements IState{
 
     @Override
     public void Init(int mapIndex) {
+        m_blocks = new ArrayList<BlockObject>();
         m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(mapIndex));
         List<Integer> startPoint = m_map.getStartPoint();
         List<Integer> boxPoint = m_map.getBoxPoint();
@@ -68,8 +70,11 @@ public class GameState implements IState{
             m_player[i].setting(startPoint.get(i*2), startPoint.get(i*2 + 1));
         }
 
-        m_testblock = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.crate), 1, 1, 2, 0);
-        m_testblock.setting(boxPoint.get(0),boxPoint.get(1));
+        for(int i = 0; i < boxPoint.size() / 2; ++i) {
+            BlockObject newBlock = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.crate), 1, 1, 2, 0);
+            newBlock.setting(boxPoint.get(i), boxPoint.get(i + 1));
+            m_blocks.add(newBlock);
+        }
 
         m_Door = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.door), 1, 2, 2,
                 BlockObject.FLAG_HOLDING | BlockObject.FLAG_NO_CHANGE_SPRITE);
@@ -104,7 +109,9 @@ public class GameState implements IState{
             cur.update(time);
             cur.ResetCollside();
         }
-        m_testblock.ResetCollside();
+
+        for(BlockObject b : m_blocks)
+            b.ResetCollside();
 
         CollisionCheck();
 
@@ -124,7 +131,8 @@ public class GameState implements IState{
         if(m_nNowPlayers <= 0)
             m_state = GAME_CLEAR;
 
-        m_testblock.update(time);
+        for(BlockObject b : m_blocks)
+            b.update(time);
         m_Gem.update(time);
         m_Effect.Update(time);
     }
@@ -146,7 +154,11 @@ public class GameState implements IState{
             for (int j = i + 1; j < MAX_PLAYER; ++j)
                 CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, false);
 
-            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_testblock.m_collBox, true);
+            // 플레이어 - 블럭 충돌
+            for(BlockObject b : m_blocks)
+                CollisionManager.checkBoxtoBox(m_player[i].m_collBox, b.m_collBox, true);
+
+            // 플레이어 - 보석
             if (m_Gem.m_player == null && m_Gem.getDrawalbe()) {
                 if (Rect.intersects(m_player[i].CollisionBox(), m_Gem.CollisionBox())) {
                     m_Gem.SetPlayer(m_player[i]);
@@ -154,6 +166,7 @@ public class GameState implements IState{
             }
         }
 
+        // 문 - 보석
         if(m_Gem.getDrawalbe()) {
             if(Rect.intersects(m_Door.CollisionBox(), m_Gem.CollisionBox())) {
                 m_Gem.setDrawable(false);
@@ -162,13 +175,22 @@ public class GameState implements IState{
 
         }
 
-        m_map.CollisionCheck(m_testblock.m_collBox);
+        // 블럭 - 블럭
+        for(int i = 0; i < m_blocks.size(); i++) {
+            for(int j = 1; j < m_blocks.size(); j++)
+                CollisionManager.checkBoxtoBox(m_blocks.get(i).m_collBox, m_blocks.get(j).m_collBox, false);
+        }
+
+        // 블럭 - 맵
+        for(BlockObject b : m_blocks)
+            m_map.CollisionCheck(b.m_collBox);
     }
     public void EndCollside() {
         for(Player cur : m_player) {
             cur.EndCollision();
         }
-        m_testblock.EndCollision();
+        for(BlockObject b : m_blocks)
+            b.EndCollision();
     }
 
 
@@ -178,8 +200,10 @@ public class GameState implements IState{
         m_back.draw(canvas);
         m_map.draw(canvas);
 
+        for(BlockObject b : m_blocks)
+            b.draw(canvas);
+
         for(Player cur : m_player) {
-            m_testblock.draw(canvas);
             cur.draw(canvas);
             if(cur == m_player[0]) {
                 //cur.setState(Player.idle);
@@ -328,7 +352,9 @@ public class GameState implements IState{
             m_player[i].SetClear(false);
         }
 
-        m_testblock.setting(boxPoint.get(0),boxPoint.get(1));
+        for(int i = 0; i < boxPoint.size() / 2; ++i) {
+            m_blocks.get(i).setting(boxPoint.get(i), boxPoint.get(i + 1));
+        }
 
         m_Door.setting(doorPoint[0],doorPoint[1]);
         m_Door.setDrawable(true);

@@ -125,7 +125,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if(gameEvent > 0) {
                 m_nowScene = GAME_SCENE;
                 m_stage = gameEvent - 1;
-                Log.d("tag", String.valueOf(gameEvent - 1));
                 ChangeGameState(new GameState(), gameEvent - 1);
                 return true;
             }
@@ -208,7 +207,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 ChangeGameState(new MainState(), MainState.SELECT_SCREEN);
             }
             if(gameEvent == GameState.NEXT_EVENT) {
+                AppManager.getInstance().setStageClearInfo(m_stage, true);
                 m_stage += 1;
+
                 if (m_stage > MAX_MAP - 1)
                     m_stage = 0;
                 ChangeGameState(new GameState(), m_stage);

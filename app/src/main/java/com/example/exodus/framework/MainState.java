@@ -16,7 +16,10 @@ import com.example.exodus.gamelogic.Player;
 
 public class MainState implements IState {
 
+    final private int YCOUNT = 5;
+    final private int XCOUNT = 6;
     final private int MAX_PLAYER = 6;
+    final private float SCALE_SIZE = 1.5f;
     static public final int START_SCREEN  = 0;
     static public final int SELECT_SCREEN = 1;
 
@@ -25,6 +28,7 @@ public class MainState implements IState {
 
     // 모든 상태에서 렌더링
     private Player[] m_player;
+    private boolean[] m_clearstageinfo;
     private SpriteObject m_map;
     private BackGround m_back;
 
@@ -49,6 +53,8 @@ public class MainState implements IState {
         // 모든 상태에서 렌더링 하는 오브젝트
         m_back  = new BackGround(AppManager.getInstance().getBitmap(R.drawable.back));
         m_map   = new SpriteObject(AppManager.getInstance().getBitmap(R.drawable.ground));
+        m_clearstageinfo = AppManager.getInstance().getStageClearinfo();
+
         m_map.initSpriteData(1,1,1);
         m_map.SetDest(new Point(AppManager.getInstance().getWidth(), AppManager.getInstance().getHeight()));
         m_map.setPosition(0, 0);
@@ -78,38 +84,48 @@ public class MainState implements IState {
         m_gamestart.initSpriteData( 2, 2, 3);
         m_gamestart.SetDestTileSize(6, 1);
         m_gamestart.setPosition(AppManager.getInstance().getWidth() / 2 - (int)(m_gamestart.GetDest().x * 1.5),
-                AppManager.getInstance().getHeight() / 2 - m_gamestart.GetDest().y);
+                AppManager.getInstance().getHeight() / 2 + m_gamestart.GetDest().y * 2);
 
         m_state = START_SCREEN;
     }
     private void InitRendSelectScreen() {
+        Point screen = new Point(AppManager.getInstance().getWidth() , AppManager.getInstance().getHeight());
+        Point tile = new Point(AppManager.getInstance().getTileWidth(), AppManager.getInstance().getTileHeight());
+
         m_stage = new SpriteObject(AppManager.getInstance().getBitmap(R.drawable.stagetext));
         m_stage.initSpriteData(1, 1, 1);
         m_stage.SetDestTileSize(16, 4);
-        m_stage.setPosition(AppManager.getInstance().getWidth() / 2 - m_stage.GetDest().x / 2,
-                AppManager.getInstance().getHeight() / 5 - m_stage.GetDest().y / 2);
+        m_stage.setPosition(screen.x / 2 - m_stage.GetDest().x / 2,
+                screen.y / 5 - m_stage.GetDest().y / 2);
 
-        m_backgroundtilesize = new Point(44, 20);
+        m_backgroundtilesize = new Point(54, 20);
+
         m_stagebackground = new SpriteObject(AppManager.getInstance().getBitmap(R.drawable.selectbackground));
         m_stagebackground.initSpriteData(1, 1, 1);
         m_stagebackground.SetDestTileSize(m_backgroundtilesize.x, m_backgroundtilesize.y);
-        m_stagebackground.setPosition(AppManager.getInstance().getWidth() / 2 - (m_stagebackground.GetDest().x / 2),
-                AppManager.getInstance().getHeight() / 2 - m_stagebackground.GetDest().y / 3);
+        m_stagebackground.setPosition(screen.x / 2 - (m_stagebackground.GetDest().x / 2),
+                screen.y / 2 - m_stagebackground.GetDest().y / 3);
 
-        m_offsettile = new Point(m_stagebackground.GetDest().x / 22, m_stagebackground.GetDest().y / 10 );
+        m_offsettile = new Point(m_stagebackground.GetDest().x / XCOUNT,
+                m_stagebackground.GetDest().y / YCOUNT);
         m_stagestartpos = new Point(m_stagebackground.getX(), m_stagebackground.getY());
 
         m_unclearstage  = new SpriteObject(AppManager.getInstance().getBitmap(R.drawable.unclearstate));
         m_unclearstage.initSpriteData(1, 10, 1);
-        m_unclearstage.SetDestTileSize(m_offsettile.x * 4 / AppManager.getInstance().getTileWidth(),
-                m_offsettile.y * 4 / AppManager.getInstance().getTileHeight());
+        m_unclearstage.SetDestTileSize(
+                (int)(m_offsettile.x * SCALE_SIZE) / (int)(tile.x * ratioStageIcon()),
+                (int)(m_offsettile.y * SCALE_SIZE) / tile.x
+        );
 
         m_clearstage    = new SpriteObject(AppManager.getInstance().getBitmap(R.drawable.clearstage));
         m_clearstage.initSpriteData(1, 10, 1);
-        m_clearstage.SetDestTileSize(m_offsettile.x * 4 / AppManager.getInstance().getTileWidth(),
-                m_offsettile.y * 4 / AppManager.getInstance().getTileHeight());
-
+        m_clearstage.SetDest(m_unclearstage.GetDest());
     }
+
+    public float ratioStageIcon() {
+        return ((float)m_backgroundtilesize.x / (float)XCOUNT) / ((float)m_backgroundtilesize.y / (float)YCOUNT);
+    }
+
     @Override
     public void Destroy() {
 
@@ -148,14 +164,22 @@ public class MainState implements IState {
     private void RenderSelectScreen(Canvas canvas) {
         m_stage.draw(canvas);
         m_stagebackground.draw(canvas);
+        Point size = m_unclearstage.GetDest();
 
         for(int i = 0; i < 2; i++) {
             for(int j = 0; j < 5; j++) {
-                Point newpos = new Point(m_stagestartpos.x + m_offsettile.x * ( 1 + j * 4 ),
-                        m_stagestartpos.y + m_offsettile.y * ( 1 + i * 4 ));
-                m_unclearstage.SetFrame( 5 * i + j);
-                m_unclearstage.setPosition(newpos);
-                m_unclearstage.draw(canvas);
+                Point newpos = new Point(m_stagestartpos.x + m_offsettile.x * (j + 1) - size.x / 2 ,
+                        m_stagestartpos.y + m_offsettile.y * (i * 2 + 1) );
+                if(m_clearstageinfo[5 * i + j]) {
+                    m_clearstage.SetFrame( 5 * i + j);
+                    m_clearstage.setPosition(newpos);
+                    m_clearstage.draw(canvas);
+                }
+                else {
+                    m_unclearstage.SetFrame( 5 * i + j);
+                    m_unclearstage.setPosition(newpos);
+                    m_unclearstage.draw(canvas);
+                }
             }
         }
     }
@@ -185,13 +209,15 @@ public class MainState implements IState {
 
     public int FindObject(int x, int y) {
         Point size = m_unclearstage.GetDest();
+
         x -= m_stagestartpos.x;
         y -= m_stagestartpos.y;
 
         for(int i = 0; i < 2; i++) {
             for(int j = 0; j < 5; j++) {
-                int xpos = m_offsettile.x * ( 1 + j * 4 );
-                int ypos = m_offsettile.y * ( 1 + i * 4 );
+                int xpos = m_offsettile.x * (j + 1) - size.x / 2;
+                int ypos = m_offsettile.y * (i * 2 + 1);
+
                 Rect newrect = new Rect(xpos, ypos,
                         xpos + size.x ,ypos + size.y);
                 if(newrect.contains(x, y)) {
