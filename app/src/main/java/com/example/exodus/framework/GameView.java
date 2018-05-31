@@ -207,11 +207,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 ChangeGameState(new MainState(), MainState.SELECT_SCREEN);
             }
             if(gameEvent == GameState.NEXT_EVENT) {
-                AppManager.getInstance().setStageClearInfo(m_stage, true);
+                AppManager.getInstance().setStageClearInfo(m_stage,  AppManager.getInstance().STAGE_CLEAR);
                 m_stage += 1;
 
                 if (m_stage > MAX_MAP - 1)
                     m_stage = 0;
+                if (AppManager.getInstance().getStageClearinfo()[m_stage] != AppManager.getInstance().STAGE_CLEAR)
+                    AppManager.getInstance().setStageClearInfo(m_stage,  AppManager.getInstance().STAGE_OPEN);
                 ChangeGameState(new GameState(), m_stage);
             }
 

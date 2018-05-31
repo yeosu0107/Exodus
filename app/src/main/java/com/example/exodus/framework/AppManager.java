@@ -14,21 +14,27 @@ import java.util.List;
  */
 
 public class AppManager {
+    static public final int STAGE_LOCK = 0;
+    static public final int STAGE_OPEN = 1;
+    static public final int STAGE_CLEAR = 2;
+
     private static AppManager g_interface;
 
     private GameView m_gameview;
     private Resources m_resource;
 
     private List<List<int[]>> m_mapList;
-    private boolean[] m_ClearStage;
+    private int[] m_ClearStage;
 
     private int screen_width;
     private int screen_height;
     //private GameState m_gamestate;
 
     public AppManager() {
-        m_ClearStage = new boolean[10];
-        for(boolean b : m_ClearStage) b = false;
+        m_ClearStage = new int[10];
+        for(int b : m_ClearStage) b = STAGE_LOCK;
+        m_ClearStage[0] = STAGE_OPEN;
+
         m_mapList=new ArrayList<List<int[]>>();
     }
 
@@ -56,8 +62,8 @@ public class AppManager {
         screen_height = y;
     }
 
-    public boolean[] getStageClearinfo() { return m_ClearStage; }
-    public void setStageClearInfo(int index, boolean info) { m_ClearStage[index] = info; }
+    public int[] getStageClearinfo() { return m_ClearStage; }
+    public void setStageClearInfo(int index, int info) { m_ClearStage[index] = info; }
     //public void setGameState(GameState state) {m_gamestate=state;}
 
     public  GameView getGameview() {

@@ -28,7 +28,7 @@ public class MainState implements IState {
 
     // 모든 상태에서 렌더링
     private Player[] m_player;
-    private boolean[] m_clearstageinfo;
+    private int[] m_clearstageinfo;
     private SpriteObject m_map;
     private BackGround m_back;
 
@@ -111,7 +111,7 @@ public class MainState implements IState {
         m_stagestartpos = new Point(m_stagebackground.getX(), m_stagebackground.getY());
 
         m_unclearstage  = new SpriteObject(AppManager.getInstance().getBitmap(R.drawable.unclearstate));
-        m_unclearstage.initSpriteData(1, 10, 1);
+        m_unclearstage.initSpriteData(1, 11, 1);
         m_unclearstage.SetDestTileSize(
                 (int)(m_offsettile.x * SCALE_SIZE) / (int)(tile.x * ratioStageIcon()),
                 (int)(m_offsettile.y * SCALE_SIZE) / tile.x
@@ -170,13 +170,18 @@ public class MainState implements IState {
             for(int j = 0; j < 5; j++) {
                 Point newpos = new Point(m_stagestartpos.x + m_offsettile.x * (j + 1) - size.x / 2 ,
                         m_stagestartpos.y + m_offsettile.y * (i * 2 + 1) );
-                if(m_clearstageinfo[5 * i + j]) {
-                    m_clearstage.SetFrame( 5 * i + j);
+                if(m_clearstageinfo[5 * i + j] == AppManager.getInstance().STAGE_CLEAR) {
+                    m_clearstage.SetFrame( 5 * i + j  );
                     m_clearstage.setPosition(newpos);
                     m_clearstage.draw(canvas);
                 }
                 else {
-                    m_unclearstage.SetFrame( 5 * i + j);
+                    if (m_clearstageinfo[5 * i + j] == AppManager.getInstance().STAGE_OPEN)
+                        m_unclearstage.SetFrame(5 * i + j + 1);
+
+                    else
+                        m_unclearstage.SetFrame(0);
+
                     m_unclearstage.setPosition(newpos);
                     m_unclearstage.draw(canvas);
                 }
@@ -221,10 +226,14 @@ public class MainState implements IState {
                 Rect newrect = new Rect(xpos, ypos,
                         xpos + size.x ,ypos + size.y);
                 if(newrect.contains(x, y)) {
-                    return 5 * i + j + 1;
+                    int stagenum = 5 * i + j + 1;
+                    if( m_clearstageinfo[stagenum - 1] != AppManager.getInstance().STAGE_LOCK)
+                        return stagenum;
+                    else
+                        return -10;
                 }
             }
         }
-        return 0;
+        return -10;
     }
 }
