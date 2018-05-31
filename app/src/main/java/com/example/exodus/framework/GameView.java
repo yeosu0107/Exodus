@@ -121,12 +121,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent event) {
         int gameEvent = m_state.onTouchEvent(event);
 
-        if(m_nowScene == MAIN_SCENE && gameEvent > 0) {
-            m_nowScene = GAME_SCENE;
-            m_stage = gameEvent - 1;
-            Log.d("tag", String.valueOf(gameEvent - 1));
-            ChangeGameState(new GameState(), gameEvent - 1);
-            return true;
+        if(m_nowScene == MAIN_SCENE) {
+            if(gameEvent > 0) {
+                m_nowScene = GAME_SCENE;
+                m_stage = gameEvent - 1;
+                Log.d("tag", String.valueOf(gameEvent - 1));
+                ChangeGameState(new GameState(), gameEvent - 1);
+                return true;
+            }
+            else
+                return true;
         }
 
         if(gameEvent == GameState.NON_EVENT) { //state에서 터치이벤트가 없을 때만 발동

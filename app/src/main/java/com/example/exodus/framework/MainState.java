@@ -180,7 +180,7 @@ public class MainState implements IState {
         if(m_state == START_SCREEN)  m_state = SELECT_SCREEN;
         else if(m_state == SELECT_SCREEN && event.getAction() == MotionEvent.ACTION_DOWN)
             return FindObject((int)event.getX(), (int)event.getY());
-        return 0;
+        return -10;
     }
 
     public int FindObject(int x, int y) {
