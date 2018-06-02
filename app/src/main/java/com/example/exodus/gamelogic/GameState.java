@@ -34,6 +34,7 @@ public class GameState implements IState{
     private List<BlockObject> m_blocks;
     private BlockObject m_Gem;
     private BlockObject m_Door;
+    private MoveBlock m_moveblock;
 
     private MapObject m_map;
     private BackGround m_back;
@@ -92,6 +93,11 @@ public class GameState implements IState{
         m_ui = new UIManager();
 
         m_nNowPlayers = 6;
+
+        m_moveblock = new MoveBlock(AppManager.getInstance().getBitmap(R.drawable.longblock),
+                MoveBlock.FLAG_MOVE_UPDOWN, 50, 8);
+        m_moveblock.SetDestTileSize(3, 1);
+        m_moveblock.settingBoxsize(10.0f, 22.0f);
     }
 
     @Override
@@ -107,12 +113,15 @@ public class GameState implements IState{
         long time = System.currentTimeMillis();
         for(Player cur : m_player) {
             cur.update(time);
+            if(cur.m_collBox.m_Collmovebox)
+                cur.move(m_moveblock.m_MDistanceNowFrame.x, m_moveblock.m_MDistanceNowFrame.y);
             cur.ResetCollside();
         }
 
         for(BlockObject b : m_blocks)
             b.ResetCollside();
 
+        m_moveblock.ResetCollside();
         CollisionCheck();
 
         for(int i = 0; i < MAX_PLAYER; ++i) {
@@ -135,11 +144,14 @@ public class GameState implements IState{
             b.update(time);
         m_Gem.update(time);
         m_Effect.Update(time);
+        m_moveblock.update(time);
     }
 
     public void CollisionCheck() {
-        for(int i = 0; i < MAX_PLAYER; ++i) {
+        for(int i = 0; i < MAX_PLAYER; ++i)
+            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_moveblock.m_collBox,  CollisionManager.COLL_MOVEBOX);
 
+        for(int i = 0; i < MAX_PLAYER; ++i) {
             //  플레이어 - 문 충돌
             if (m_Door.NowFrame() == 1) {
                 if (!m_player[i].GetClear() && Rect.intersects(m_player[i].CollisionBox(), m_Door.CollisionBox())) {
@@ -152,11 +164,11 @@ public class GameState implements IState{
             // 플레이어 - 맵 충돌
             m_map.CollisionCheck(m_player[i].m_collBox);
             for (int j = i + 1; j < MAX_PLAYER; ++j)
-                CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, false);
+                    CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, CollisionManager.COLL_PLAYER);
 
             // 플레이어 - 블럭 충돌
             for(BlockObject b : m_blocks)
-                CollisionManager.checkBoxtoBox(m_player[i].m_collBox, b.m_collBox, true);
+                CollisionManager.checkBoxtoBox(m_player[i].m_collBox, b.m_collBox, CollisionManager.COLL_MAP);
 
             // 플레이어 - 보석
             if (m_Gem.m_player == null && m_Gem.getDrawalbe()) {
@@ -165,6 +177,8 @@ public class GameState implements IState{
                 }
             }
         }
+
+        InfectionMovebox(0);
 
         // 문 - 보석
         if(m_Gem.getDrawalbe()) {
@@ -178,7 +192,7 @@ public class GameState implements IState{
         // 블럭 - 블럭
         for(int i = 0; i < m_blocks.size(); i++) {
             for(int j = 1; j < m_blocks.size(); j++)
-                CollisionManager.checkBoxtoBox(m_blocks.get(i).m_collBox, m_blocks.get(j).m_collBox, false);
+                CollisionManager.checkBoxtoBox(m_blocks.get(i).m_collBox, m_blocks.get(j).m_collBox, CollisionManager.COLL_PLAYER);
         }
 
         // 블럭 - 맵
@@ -213,7 +227,7 @@ public class GameState implements IState{
         m_Gem.draw(canvas);
         m_Door.draw(canvas);
         m_Effect.draw(canvas);
-
+        m_moveblock.draw(canvas);
         m_ui.render(m_state, canvas);
     }
 
@@ -367,5 +381,21 @@ public class GameState implements IState{
         m_nNowPlayers = 6;
 
         m_state = GAME_RUNNING;
+    }
+
+    // 움직이는 벽과 충돌한 캐릭터주위에 있는 캐릭터들을 탐색하기 위한 함수
+    public void InfectionMovebox(int index1) {
+        if(index1 >= MAX_PLAYER) return ;
+        if(!m_player[index1].m_collBox.m_Collmovebox) {
+            InfectionMovebox(index1 + 1);
+            return ;
+        }
+        for(int i = 0 ; i < MAX_PLAYER; ++i) {
+            if (i != index1) {
+                if (!m_player[i].m_collBox.m_Collmovebox)
+                    if (CollisionManager.InfectionMovebox(m_player[index1].m_collBox, m_player[i].m_collBox))
+                        InfectionMovebox(i);
+            } else continue;
+        }
     }
 }

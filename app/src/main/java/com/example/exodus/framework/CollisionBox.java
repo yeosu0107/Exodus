@@ -25,6 +25,7 @@ public class CollisionBox {
 
     public boolean m_DisableCollCheck;
     public boolean m_NowCollcheck;  // 현재 충돌 체크 중인지 여부
+    public boolean m_Collmovebox;
     public int m_Scale = 2;
 
     public CollisionBox(Rect rect, int scale) {
@@ -37,7 +38,7 @@ public class CollisionBox {
         m_Size = new Point(rect.width() * m_Scale, rect.height()* m_Scale);
         m_ColliisionBox.right = m_ColliisionBox.left + m_Size.x;
         m_ColliisionBox.bottom = m_ColliisionBox.top + m_Size.y;
-
+        m_Collmovebox = false;
         m_Paint= new Paint();
         m_Paint.setColor(Color.WHITE);
     }
@@ -67,12 +68,11 @@ public class CollisionBox {
         return m_Collside;
     }
 
-    public void EndCollision() {
-        m_NowCollcheck = false;
-    }
+    public void EndCollision() { m_NowCollcheck = false; }
 
     public void Reset() {
         m_NowCollcheck = true;
+        m_Collmovebox = false;
         m_PreCollside = m_Collside;
         m_Collside = 0;
     }

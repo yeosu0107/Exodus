@@ -129,8 +129,10 @@ public class Player{
         //m_x += x;
         //m_y += y;
 
-        m_ani[m_state + m_dir].setPosition(m_x, m_y);
-
+        if(m_state != unclick)
+            m_ani[m_state + m_dir].setPosition(m_x, m_y);
+        else
+            m_ani[m_state].setPosition(m_x, m_y);
     }
 
     public Point GetPosition() {

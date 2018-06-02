@@ -33,9 +33,12 @@ public class GameViewThread extends Thread {
                 synchronized (m_surface) {
                     m_view.MyonDraw(canvas);
                 }
+                m_surface.unlockCanvasAndPost(canvas);
             } finally {
-                if(canvas != null)
-                    m_surface.unlockCanvasAndPost(canvas);
+                if(canvas != null) {
+                    //canvas=m_surface.lockCanvas(null);
+                    //m_surface.unlockCanvasAndPost(canvas);
+                }
             }
         }
     }

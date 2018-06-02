@@ -25,12 +25,12 @@ public class BlockObject {
     public CollisionBox m_collBox;
     public Player m_player = null;
 
-    private boolean m_drawable = true;
+    protected boolean m_drawable = true;
 
-    private int m_Flags = 0;
-    private int m_x, m_y;
+    protected int m_Flags = 0;
+    protected int m_x, m_y;
 
-    private SpriteObject m_Texture;
+    protected SpriteObject m_Texture;
 
 
     public BlockObject(Bitmap bitmap, int FPS, int nFrame, int time, int flag) {
@@ -105,8 +105,8 @@ public class BlockObject {
     public void SetPlayer(Player player) { m_player = player; }
     public boolean getDrawalbe() { return m_drawable; }
 
-    public void move(int x, int y) {
-        if(!m_drawable) return;
+    public Point move(int x, int y) {
+        if(!m_drawable) return new Point();
         if(x > 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_RIGHT)) x = 0;
         else if(x < 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_LEFT)) x = 0;
         if( y > 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_BOTTOM)) y = 0 ;
@@ -117,6 +117,7 @@ public class BlockObject {
         m_y = m_collBox.GetPosition().y;
 
         m_Texture.setPosition(m_x, m_y);
+        return new Point(x,y);
     }
 
     public Rect CollisionBox() {return m_collBox.m_ColliisionBox;}
@@ -126,4 +127,8 @@ public class BlockObject {
     }
     public void EndCollision() { m_collBox.EndCollision();}
     public Point GetPosition() {return new Point(m_x, m_y); }
+    public void SetDestTileSize(int x, int y) {
+        m_Texture.SetDestTileSize(x, y);
+        m_collBox = new CollisionBox(new Rect(0,0,m_Texture.GetDest().x, m_Texture.GetDest().y), 1);
+    }
 }
