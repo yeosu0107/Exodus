@@ -31,9 +31,9 @@ public class CollisionManager {
         if(collBox1.left <= 0) box1.m_Collside |= SIDE_LEFT;
         if(collBox1.right >= (AppManager.getInstance().getWidth())) box1.m_Collside |= SIDE_RIGHT;
 
-        if(!Rect.intersects(collBox1, collBox2)) return false;
+        if(!intersects(collBox1, collBox2)) return false;
 
-        collChectBox.setIntersect(collBox1, collBox2);
+        setIntersect(collChectBox, collBox1, collBox2);
 
         if(collChectBox.centerY() < box1.m_ColliisionBox.centerY()) {
             collside1 |= SIDE_TOP;
@@ -62,7 +62,7 @@ public class CollisionManager {
         AfterCollision(box1, collChectBox,collside1);
 
         if((flag & COLL_MAP) > 0) {
-            AfterCollision(box2, collChectBox,collside2);
+            //AfterCollision(box2, collChectBox,collside2);
         }
 
         if((flag & COLL_MOVEBOX) > 0) {
@@ -86,12 +86,11 @@ public class CollisionManager {
     }
 
     public static void AfterCollision(CollisionBox box, Rect collChectBox, int collside){
-        int newCollside = (~(box.m_Collside & collside)) & collside;
 
-        if((newCollside & SIDE_BOTTOM) > 0)
-            box.Move(0,-collChectBox.height() / 2);
-        if((newCollside & SIDE_TOP) > 0)
-            box.Move(0,collChectBox.height() / 2);
+        if((collside & SIDE_BOTTOM) > 0)
+            box.Move(0,-collChectBox.height());
+        //if((newCollside & SIDE_TOP) > 0)
+        //    box.Move(0,collChectBox.height() / 2);
     }
 
     public static boolean InfectionMovebox(CollisionBox box1, CollisionBox box2) {
@@ -101,12 +100,27 @@ public class CollisionManager {
         Rect collBox1 = new Rect(box1.m_ColliisionBox);
         Rect collBox2 = new Rect(box2.m_ColliisionBox);
 
-        if(!Rect.intersects(collBox1, collBox2)) return false;
+        if(!intersects(collBox1, collBox2)) return false;
         if(box1.m_Collmovebox)
             box2.m_Collmovebox = true;
         else if(box2.m_Collmovebox)
             box1.m_Collmovebox = true;
 
         return true;
+    }
+
+    public static boolean intersects(Rect a, Rect b) {
+        return a.left <= b.right && b.left <= a.right && a.top <= b.bottom && b.top <= a.bottom;
+    }
+
+    public static boolean setIntersect(Rect origin, Rect a, Rect b) {
+        if (a.left <= b.right && b.left <= a.right && a.top <= b.bottom && b.top <= a.bottom) {
+            origin.left = Math.max(a.left, b.left);
+            origin.top = Math.max(a.top, b.top);
+            origin.right = Math.min(a.right, b.right);
+            origin.bottom = Math.min(a.bottom, b.bottom);
+            return true;
+        }
+        return false;
     }
 }

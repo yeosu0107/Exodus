@@ -121,7 +121,7 @@ public class Player{
         }
         else if( y < 0 && !m_collBox.IsEnableMove(CollisionManager.SIDE_TOP)) y = 0;
 
-        if( y > 0) m_state = jumpdown;
+        if( y > 0) m_state = m_state == unclick ? unclick : jumpdown;
 
         m_collBox.Move(x, y);
         m_x = m_collBox.GetPosition().x;

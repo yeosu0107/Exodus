@@ -98,7 +98,8 @@ public class GameState implements IState{
         m_nNowPlayers = 6;
 
         m_moveblock = new MoveBlock(AppManager.getInstance().getBitmap(R.drawable.longblock),
-                MoveBlock.FLAG_MOVE_UPDOWN, 50, 8);
+                MoveBlock.FLAG_MOVE_UP, 50, 5);
+        m_moveblock.SetNeedPlayer(3);
         m_moveblock.SetDestTileSize(3, 1);
         m_moveblock.settingBoxsize(10.0f, 22.0f);
     }
@@ -114,12 +115,14 @@ public class GameState implements IState{
             return;
 
         long time = System.currentTimeMillis();
+        int numofOnMoveBox = 0;
         for(Player cur : m_player) {
             cur.update(time);
             if(cur.m_collBox.m_Collmovebox)
                 cur.move(m_moveblock.m_MDistanceNowFrame.x, m_moveblock.m_MDistanceNowFrame.y);
             cur.ResetCollside();
         }
+
 
         for(BlockObject b : m_blocks)
             b.ResetCollside();
@@ -129,7 +132,7 @@ public class GameState implements IState{
 
         for(int i = 0; i < MAX_PLAYER; ++i) {
             if(m_player[i].State() != Player.jumpup) {
-                if (m_player[i].State() == Player.unclick) continue;
+                //if (m_player[i].State() == Player.unclick) continue;
                 m_player[i].move(0, 8);
             }
             if(m_player[i].GetPosition().y > AppManager.getInstance().getHeight())
@@ -153,8 +156,13 @@ public class GameState implements IState{
 
         for(BlockObject b : m_blocks)
             b.update(time);
+
+        for(Player cur : m_player)
+            numofOnMoveBox = cur.m_collBox.m_Collmovebox ? ++numofOnMoveBox : numofOnMoveBox;
+
         m_Gem.update(time);
         m_Effect.Update(time);
+        m_moveblock.Work(numofOnMoveBox);
         m_moveblock.update(time);
     }
 
@@ -174,7 +182,8 @@ public class GameState implements IState{
 
             // 플레이어 - 맵 충돌
             m_map.CollisionCheck(m_player[i].m_collBox);
-            for (int j = i + 1; j < MAX_PLAYER; ++j)
+            for (int j = 0; j < MAX_PLAYER; ++j)
+                if(i != j)
                     CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, CollisionManager.COLL_PLAYER);
 
             // 플레이어 - 블럭 충돌
