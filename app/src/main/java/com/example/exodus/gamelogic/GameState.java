@@ -45,19 +45,22 @@ public class GameState implements IState{
     static public final int GAME_RUNNING = 0;
     static public final int GAME_PAUSE = 1;
     static public final int GAME_CLEAR = 2;
+    static public final int GAME_FAIL = 3;
 
     static public final int NON_EVENT = 0;
     static public final int BLANK_EVENT = 1;
     static public final int NEXT_EVENT = 2;
-    static public final int HOME_EVENT = 3;
+    static public final int CLEAR_EVENT = 3;
     static public final int EXIT_EVENT = 4;
 
 
-
+    private int m_thisStage;
     private int m_state;
 
     @Override
     public void Init(int mapIndex) {
+        m_thisStage = mapIndex;
+
         m_blocks = new ArrayList<BlockObject>();
         m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(mapIndex));
         List<Integer> startPoint = m_map.getStartPoint();
@@ -71,7 +74,7 @@ public class GameState implements IState{
             m_player[i].setting(startPoint.get(i*2), startPoint.get(i*2 + 1));
         }
 
-        for(int i = 0; i < boxPoint.size() / 2; ++i) {
+        for(int i = 0; i < boxPoint.size(); i+=2) {
             BlockObject newBlock = new BlockObject(AppManager.getInstance().getBitmap(R.drawable.crate), 1, 1, 2, 0);
             newBlock.setting(boxPoint.get(i), boxPoint.get(i + 1));
             m_blocks.add(newBlock);
@@ -129,6 +132,8 @@ public class GameState implements IState{
                 if (m_player[i].State() == Player.unclick) continue;
                 m_player[i].move(0, 8);
             }
+            if(m_player[i].GetPosition().y > AppManager.getInstance().getHeight())
+                m_state = GAME_FAIL;
         }
 
         EndCollside();
@@ -137,8 +142,14 @@ public class GameState implements IState{
         if(m_NumofGem == 0)
             m_Door.SetSpriteFrame(1);
 
-        if(m_nNowPlayers <= 0)
+        if(m_nNowPlayers <= 0) {
             m_state = GAME_CLEAR;
+            AppManager.getInstance().setStageClearInfo(m_thisStage,  AppManager.getInstance().STAGE_CLEAR);
+            if(m_thisStage + 1 < 10) {
+                if (AppManager.getInstance().getStageClearinfo()[m_thisStage + 1] != AppManager.getInstance().STAGE_CLEAR)
+                    AppManager.getInstance().setStageClearInfo(m_thisStage + 1, AppManager.getInstance().STAGE_OPEN);
+            }
+        }
 
         for(BlockObject b : m_blocks)
             b.update(time);
@@ -341,15 +352,17 @@ public class GameState implements IState{
                     break;
                 case GAME_CLEAR:
                     if(uiEvent == 0) {
-
+                        touched = EXIT_EVENT;
                     }
                     else if(uiEvent == 1) {
                         touched = NEXT_EVENT;
                     }
-                    else if(uiEvent == 2) {
-
-                    }
                     break;
+                case GAME_FAIL:
+                    if(uiEvent == 0)
+                        touched = EXIT_EVENT;
+                    else
+                        resetMap();
             }
         }
         return touched;
@@ -376,6 +389,7 @@ public class GameState implements IState{
 
         m_Gem.setting(keyPoint[0], keyPoint[1]);
         m_Gem.setDrawable(true);
+        m_Gem.SetPlayer(null);
 
         m_NumofGem = 1;
         m_nNowPlayers = 6;
