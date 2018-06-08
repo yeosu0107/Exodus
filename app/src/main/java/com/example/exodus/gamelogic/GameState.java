@@ -3,8 +3,10 @@ import com.example.exodus.BlockObject;
 import com.example.exodus.framework.CollisionBox;
 
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.provider.Contacts;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -34,7 +36,7 @@ public class GameState implements IState{
     private List<BlockObject> m_blocks;
     private BlockObject m_Gem;
     private BlockObject m_Door;
-    private MoveBlock m_moveblock;
+    private List<MoveBlock> m_moveblock;
 
     private MapObject m_map;
     private BackGround m_back;
@@ -65,6 +67,8 @@ public class GameState implements IState{
         m_map = new MapObject(AppManager.getInstance().getBitmap(R.drawable.tileset), 25, 23, AppManager.getInstance().getMap(mapIndex));
         List<Integer> startPoint = m_map.getStartPoint();
         List<Integer> boxPoint = m_map.getBoxPoint();
+        List<Point> moveBlockPoint = m_map.getMoveBoxPoint();
+
         int[] doorPoint = m_map.get_doorPoint();
         int[] keyPoint = m_map.getKeyPoint();
 
@@ -97,11 +101,16 @@ public class GameState implements IState{
 
         m_nNowPlayers = 6;
 
-        m_moveblock = new MoveBlock(AppManager.getInstance().getBitmap(R.drawable.longblock),
-                MoveBlock.FLAG_MOVE_UP, 50, 5);
-        m_moveblock.SetNeedPlayer(3);
-        m_moveblock.SetDestTileSize(3, 1);
-        m_moveblock.settingBoxsize(10.0f, 22.0f);
+        m_moveblock = new ArrayList<MoveBlock>();
+
+        for(Point p : moveBlockPoint) {
+            MoveBlock moveblock = new MoveBlock(AppManager.getInstance().getBitmap(R.drawable.longblock),
+                    MoveBlock.FLAG_MOVE_UP, 50, 10);
+            moveblock.SetNeedPlayer(3);
+            moveblock.SetDestTileSize(4 , 1);
+            moveblock.setting(p.x, p.y);
+            m_moveblock.add(moveblock);
+        }
     }
 
     @Override
@@ -115,11 +124,13 @@ public class GameState implements IState{
             return;
 
         long time = System.currentTimeMillis();
-        int numofOnMoveBox = 0;
+        int[] numofOnMoveBox = new int[m_moveblock.size()];
+
         for(Player cur : m_player) {
             cur.update(time);
-            if(cur.m_collBox.m_Collmovebox)
-                cur.move(m_moveblock.m_MDistanceNowFrame.x, m_moveblock.m_MDistanceNowFrame.y);
+            for(int i = 0; i < m_moveblock.size(); ++i)
+                if((cur.m_collBox.m_Collmovebox & (int)Math.pow(2, i)) > 0)
+                    cur.move(m_moveblock.get(i).m_MDistanceNowFrame.x, m_moveblock.get(i).m_MDistanceNowFrame.y);
             cur.ResetCollside();
         }
 
@@ -127,7 +138,8 @@ public class GameState implements IState{
         for(BlockObject b : m_blocks)
             b.ResetCollside();
 
-        m_moveblock.ResetCollside();
+        for(int i = 0; i < m_moveblock.size(); ++i)
+            m_moveblock.get(i).ResetCollside();
         CollisionCheck();
 
         for(int i = 0; i < MAX_PLAYER; ++i) {
@@ -158,17 +170,22 @@ public class GameState implements IState{
             b.update(time);
 
         for(Player cur : m_player)
-            numofOnMoveBox = cur.m_collBox.m_Collmovebox ? ++numofOnMoveBox : numofOnMoveBox;
+            for(int i = 0; i < m_moveblock.size(); ++i)
+                numofOnMoveBox[i] = (cur.m_collBox.m_Collmovebox & (int)Math.pow(2, i)) > 0 ? ++numofOnMoveBox[i] : numofOnMoveBox[i];
 
         m_Gem.update(time);
         m_Effect.Update(time);
-        m_moveblock.Work(numofOnMoveBox);
-        m_moveblock.update(time);
+        for(int i = 0; i < m_moveblock.size(); ++i) {
+            m_moveblock.get(i).Work(numofOnMoveBox[i]);
+            Log.d("MoveBox", String.valueOf(numofOnMoveBox[i]));
+            m_moveblock.get(i).update(time);
+        }
     }
 
     public void CollisionCheck() {
         for(int i = 0; i < MAX_PLAYER; ++i)
-            CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_moveblock.m_collBox,  CollisionManager.COLL_MOVEBOX);
+            for(int j = 0; j < m_moveblock.size(); ++j)
+                CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_moveblock.get(j).m_collBox,  CollisionManager.COLL_MOVEBOX, j);
 
         for(int i = 0; i < MAX_PLAYER; ++i) {
             //  플레이어 - 문 충돌
@@ -183,12 +200,12 @@ public class GameState implements IState{
             // 플레이어 - 맵 충돌
             m_map.CollisionCheck(m_player[i].m_collBox);
             for (int j = 0; j < MAX_PLAYER; ++j)
-                if(i != j)
-                    CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, CollisionManager.COLL_PLAYER);
+                if(i != j && !m_player[j].GetClear() && !m_player[i].GetClear())
+                    CollisionManager.checkBoxtoBox(m_player[i].m_collBox, m_player[j].m_collBox, CollisionManager.COLL_PLAYER, 0);
 
             // 플레이어 - 블럭 충돌
             for(BlockObject b : m_blocks)
-                CollisionManager.checkBoxtoBox(m_player[i].m_collBox, b.m_collBox, CollisionManager.COLL_MAP);
+                CollisionManager.checkBoxtoBox(m_player[i].m_collBox, b.m_collBox, CollisionManager.COLL_MAP, 0);
 
             // 플레이어 - 보석
             if (m_Gem.m_player == null && m_Gem.getDrawalbe()) {
@@ -198,7 +215,9 @@ public class GameState implements IState{
             }
         }
 
-        InfectionMovebox(0);
+        for(int j = 0; j < MAX_PLAYER; ++j)
+            for(int i = 0; i < m_moveblock.size(); ++i)
+                InfectionMovebox(j, i);
 
         // 문 - 보석
         if(m_Gem.getDrawalbe()) {
@@ -212,7 +231,7 @@ public class GameState implements IState{
         // 블럭 - 블럭
         for(int i = 0; i < m_blocks.size(); i++) {
             for(int j = 1; j < m_blocks.size(); j++)
-                CollisionManager.checkBoxtoBox(m_blocks.get(i).m_collBox, m_blocks.get(j).m_collBox, CollisionManager.COLL_PLAYER);
+                CollisionManager.checkBoxtoBox(m_blocks.get(i).m_collBox, m_blocks.get(j).m_collBox, CollisionManager.COLL_PLAYER, 0);
         }
 
         // 블럭 - 맵
@@ -247,7 +266,8 @@ public class GameState implements IState{
         m_Gem.draw(canvas);
         m_Door.draw(canvas);
         m_Effect.draw(canvas);
-        m_moveblock.draw(canvas);
+        for(int i = 0; i < m_moveblock.size(); ++i)
+            m_moveblock.get(i).draw(canvas);
         m_ui.render(m_state, canvas);
     }
 
@@ -407,17 +427,17 @@ public class GameState implements IState{
     }
 
     // 움직이는 벽과 충돌한 캐릭터주위에 있는 캐릭터들을 탐색하기 위한 함수
-    public void InfectionMovebox(int index1) {
+    public void InfectionMovebox(int index1, int boxindex) {
         if(index1 >= MAX_PLAYER) return ;
-        if(!m_player[index1].m_collBox.m_Collmovebox) {
-            InfectionMovebox(index1 + 1);
+        if(!((m_player[index1].m_collBox.m_Collmovebox & (int)Math.pow(2, boxindex)) > 0)) {
+            InfectionMovebox(index1 + 1, boxindex);
             return ;
         }
         for(int i = 0 ; i < MAX_PLAYER; ++i) {
             if (i != index1) {
-                if (!m_player[i].m_collBox.m_Collmovebox)
-                    if (CollisionManager.InfectionMovebox(m_player[index1].m_collBox, m_player[i].m_collBox))
-                        InfectionMovebox(i);
+                if (!((m_player[i].m_collBox.m_Collmovebox & (int)Math.pow(2, boxindex)) > 0))
+                    if (CollisionManager.InfectionMovebox(m_player[index1].m_collBox, m_player[i].m_collBox, boxindex))
+                        InfectionMovebox(i, boxindex);
             } else continue;
         }
     }

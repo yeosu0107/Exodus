@@ -17,8 +17,7 @@ public class CollisionManager {
     static public final int COLL_MOVEBOX = 2;
     static public final int COLL_PLAYER = 4;
 
-    public static boolean checkBoxtoBox(CollisionBox box1, CollisionBox box2, int flag) {
-        if(box1.m_DisableCollCheck || box2.m_DisableCollCheck) return false;
+    public static boolean checkBoxtoBox(CollisionBox box1, CollisionBox box2, int flag, int boxindex) {
 
         Rect collBox1 = new Rect(box1.m_ColliisionBox);
         Rect collBox2 = new Rect(box2.m_ColliisionBox);
@@ -66,14 +65,14 @@ public class CollisionManager {
         }
 
         if((flag & COLL_MOVEBOX) > 0) {
-            box1.m_Collmovebox = true;
+            box1.m_Collmovebox |= (int)Math.pow(2, boxindex);
         }
 
         if((flag & COLL_PLAYER) > 0) {
-            if(box1.m_Collmovebox)
-                box2.m_Collmovebox = true;
-            else if(box2.m_Collmovebox)
-                box1.m_Collmovebox = true;
+            if((box1.m_Collmovebox & (int)Math.pow(2, boxindex)) > 0 )
+                box2.m_Collmovebox |= (int)Math.pow(2, boxindex);
+            else if((box2.m_Collmovebox & (int)Math.pow(2, boxindex)) > 0)
+                box1.m_Collmovebox |= (int)Math.pow(2, boxindex);
         }
         box1.m_Collside |= collside1;
         box2.m_Collside |= collside2;
@@ -93,7 +92,7 @@ public class CollisionManager {
         //    box.Move(0,collChectBox.height() / 2);
     }
 
-    public static boolean InfectionMovebox(CollisionBox box1, CollisionBox box2) {
+    public static boolean InfectionMovebox(CollisionBox box1, CollisionBox box2, int boxindex) {
 
         if(box1.m_DisableCollCheck || box2.m_DisableCollCheck) return false;
 
@@ -101,10 +100,10 @@ public class CollisionManager {
         Rect collBox2 = new Rect(box2.m_ColliisionBox);
 
         if(!intersects(collBox1, collBox2)) return false;
-        if(box1.m_Collmovebox)
-            box2.m_Collmovebox = true;
-        else if(box2.m_Collmovebox)
-            box1.m_Collmovebox = true;
+        if((box1.m_Collmovebox & (int)Math.pow(2, boxindex)) > 0)
+            box2.m_Collmovebox |= (int)Math.pow(2, boxindex);
+        else if((box2.m_Collmovebox & (int)Math.pow(2, boxindex)) > 0)
+            box1.m_Collmovebox |= (int)Math.pow(2, boxindex);
 
         return true;
     }

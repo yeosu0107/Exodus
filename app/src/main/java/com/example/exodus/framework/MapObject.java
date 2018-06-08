@@ -2,6 +2,7 @@ package com.example.exodus.framework;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -23,6 +24,7 @@ public class MapObject extends GraphicObject{
 
     private List<Integer> m_startPoint;
     private List<Integer> m_boxPoint;
+    private List<Point> m_moveBoxPoint;
     private int[] m_keyPoint;
     private int[] m_doorPoint;
 
@@ -33,6 +35,7 @@ public class MapObject extends GraphicObject{
         m_Height = m_bit.getHeight() / nHeight;
         m_tiles = tiles;
         m_Collboxs = new ArrayList<CollisionBox>();
+        m_moveBoxPoint = new ArrayList<Point>();
         m_bit = CreateMapResource();
 
     }
@@ -85,6 +88,9 @@ public class MapObject extends GraphicObject{
                         m_keyPoint[0] = j*sliceX;
                         m_keyPoint[1] = i*sliceY;
                     }
+                    else if(line[j] == -50) {
+                        m_moveBoxPoint.add(new Point(j*sliceX, i * sliceY));
+                    }
                     continue;
                 }
                 int xValue = line[j]%25;
@@ -119,7 +125,7 @@ public class MapObject extends GraphicObject{
 
     public void CollisionCheck(CollisionBox other) {
         for(int i = m_Collboxs.size(); i > 0; --i) {
-            CollisionManager.checkBoxtoBox(other, m_Collboxs.get(i - 1), CollisionManager.COLL_MAP);
+            CollisionManager.checkBoxtoBox(other, m_Collboxs.get(i - 1), CollisionManager.COLL_MAP, 0);
         }
     }
     @Override
@@ -148,5 +154,6 @@ public class MapObject extends GraphicObject{
     public List<Integer> getStartPoint() {return m_startPoint; }
     public int[] getKeyPoint() {return m_keyPoint; }
     public int[] get_doorPoint() {return m_doorPoint;}
+    public List<Point> getMoveBoxPoint() {return m_moveBoxPoint;}
     public List<Integer> getBoxPoint() {return m_boxPoint; }
 }
