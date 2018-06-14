@@ -17,6 +17,7 @@ import com.example.exodus.framework.CollisionManager;
 import com.example.exodus.framework.EffectManagement;
 import com.example.exodus.framework.IState;
 import com.example.exodus.framework.MapObject;
+import com.example.exodus.framework.SoundManager;
 import com.example.exodus.gamelogic.UIManager;
 
 import java.util.ArrayList;
@@ -111,6 +112,8 @@ public class GameState implements IState{
             moveblock.setting(p.x, p.y);
             m_moveblock.add(moveblock);
         }
+
+        //SoundManager.getInstance().play(0, -1);
     }
 
     @Override
@@ -158,11 +161,14 @@ public class GameState implements IState{
             m_Door.SetSpriteFrame(1);
 
         if(m_nNowPlayers <= 0) {
-            m_state = GAME_CLEAR;
-            AppManager.getInstance().setStageClearInfo(m_thisStage,  AppManager.getInstance().STAGE_CLEAR);
-            if(m_thisStage + 1 < 10) {
-                if (AppManager.getInstance().getStageClearinfo()[m_thisStage + 1] != AppManager.getInstance().STAGE_CLEAR)
-                    AppManager.getInstance().setStageClearInfo(m_thisStage + 1, AppManager.getInstance().STAGE_OPEN);
+            if(m_state != GAME_CLEAR) {
+                m_state = GAME_CLEAR;
+                AppManager.getInstance().setStageClearInfo(m_thisStage, AppManager.getInstance().STAGE_CLEAR);
+                SoundManager.getInstance().play(1, 0);
+                if (m_thisStage + 1 < 10) {
+                    if (AppManager.getInstance().getStageClearinfo()[m_thisStage + 1] != AppManager.getInstance().STAGE_CLEAR)
+                        AppManager.getInstance().setStageClearInfo(m_thisStage + 1, AppManager.getInstance().STAGE_OPEN);
+                }
             }
         }
 

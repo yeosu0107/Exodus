@@ -39,6 +39,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public GameView(Context context) throws IOException {
         super(context);
 
+        SoundManager.getInstance().Init(context);
+        //SoundManager.getInstance().addSound(0, R.raw.bgm);
+        SoundManager.getInstance().addSound(1, R.raw.clear);
+        SoundManager.getInstance().addSound(2, R.raw.jump);
+
         AppManager.getInstance().setGameview(this);
         AppManager.getInstance().setResources(getResources());
 
@@ -61,6 +66,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         m_stick = new VirtualJoystick();
         m_jump = new JumpButton();
+
+
     }
 
     //@Override
@@ -77,6 +84,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     void Update() {
         m_state.MovePlayers(m_jump.isJump(), move_x);
         m_state.Update();
+
     }
 
     @Override
@@ -146,6 +154,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     } else if(event.getX() > AppManager.getInstance().getWidth() / 2+100){
                         m_jump.setPosition((int) event.getX(), (int) event.getY());
                         m_jump.setJump(true);
+                        SoundManager.getInstance().play(2, 0);
                     }
                     break;
                 case MotionEvent.ACTION_MOVE: // 터치가 눌린 상태에서 움직일 때
@@ -178,6 +187,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     } else if(multi_x > AppManager.getInstance().getWidth() / 2+100){
                         m_jump.setPosition((int) multi_x, (int) multi_y);
                         m_jump.setJump(true);
+                        SoundManager.getInstance().play(2, 0);
                     }
                     break;
                 case MotionEvent.ACTION_POINTER_UP: // 터치가 두 개 이상일 때 떼어졌을 때

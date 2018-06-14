@@ -70,6 +70,8 @@ public class MainState implements IState {
 
         InitRendStartScreen();
         InitRendSelectScreen();
+
+        //SoundManager.getInstance().play(0, -1);
     }
 
     private void InitRendStartScreen() {
